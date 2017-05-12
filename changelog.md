@@ -9,7 +9,7 @@ ChangeLog
 
 v0.9.1
 ------
-- fix upper case issue in filename
+- fixed upper case typo in filename
 
 v0.9.0
 ------
