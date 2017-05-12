@@ -12,18 +12,18 @@
  *
  *
  * PHP 5.2+
- * @version       0.9.0
+ * @version       0.9.1
  * @author        Christophe BRISBOIS - http://www.brisbois.fr/
  * @Contributor   Ruplahlava - https://github.com/Ruplahlava
  * @Contributor   EelcoA  - https://github.com/EelcoA
  * @Contributor   eae710 - https://github.com/eae710
  * @copyright     Copyright 2015
- * @license       CC BY-NC 3.0
+ * @license       GPL v3 and commercial
  * @link          https://github.com/nanostudio-org/nanoPhotosProvider2
  * @Support       https://github.com/nanostudio-org/nanoPhotosProvider2/issues
  *
  */
-require './nano_photos_provider2.JSON.class.php';
+require './nano_photos_provider2.json.class.php';
 
 // Available values development, production
 // Codeigniter env switch https://github.com/bcit-ci/CodeIgniter/

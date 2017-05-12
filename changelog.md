@@ -7,6 +7,10 @@ nanoPhotosProvider2 - nanogallery2 plugin
 ChangeLog 
 ------
 
+v0.9.1
+------
+- fix upper case issue in filename
+
 v0.9.0
 ------
 

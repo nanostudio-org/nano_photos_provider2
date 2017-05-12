@@ -30,9 +30,9 @@ class item
     public $ID          = '';
     public $albumID     = '0';
     public $kind        = '';       // 'album', 'image'
-    public $t_url       = [];       // thumbnails URL
-    public $t_width     = [];       // thumbnails width
-    public $t_height    = [];       // thumbnails height
+    public $t_url       = array();       // thumbnails URL
+    public $t_width     = array();       // thumbnails width
+    public $t_height    = array();       // thumbnails height
     public $dc          = '#000';   // image dominant color
     // public $dcGIF       = '#000';   // image dominant color
 
@@ -45,10 +45,10 @@ class galleryJSON
     protected $data;
     protected $albumID;
     protected $album;
-    protected $tn_size  = [];
-    protected $ctn_urls = [];
-    protected $ctn_w    = [];
-    protected $ctn_h    = [];
+    protected $tn_size  = array();
+    protected $ctn_urls = array();
+    protected $ctn_w    = array();
+    protected $ctn_h    = array();
     protected $currentItem;
             
     const CONFIG_FILE    = './nano_photos_provider2.cfg';
@@ -247,9 +247,9 @@ class galleryJSON
     protected function GetThumbnail2( $baseFolder, $filename )
     {
         
-      $s  = [ 'xs',   'sm',   'me',   'la',   'xl'  ];
-      $sw = [ 'wxs',  'wsm',  'wme',  'wla',  'wxl' ];
-      $sh = [ 'hxs',  'hsm',  'hme',  'hla',  'hxl' ];
+      $s  = array( 'xs',   'sm',   'me',   'la',   'xl'  );
+      $sw = array( 'wxs',  'wsm',  'wme',  'wla',  'wxl' );
+      $sh = array( 'hxs',  'hsm',  'hme',  'hla',  'hxl' );
       for( $i = 0; $i < count($s) ; $i++ ) {
         $pi=pathinfo($filename);
         $tn= $pi['filename'] . '_' . $this->tn_size[$sw[$i]] . '_' . $this->tn_size[$sh[$i]] . '.' . $pi['extension'];

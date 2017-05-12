@@ -22,11 +22,11 @@ On your webserver:
 - in this folder:
   - copy the files:
     - `nano_photos_provider2.php`,
-    - `nano_photos_provider2.class.php`,
+    - `nano_photos_provider2.json.class.php`,
     - `nano_photos_provider2.cfg` and
-    - `nano_photos_provider2.Encoding.php`
+    - `nano_photos_provider2.encoding.php`
   - create a folder named `nano_photos_content`  
-    - copy your photos here  
+    - copy your photos there  
     - you can organize your photos in folders (= albums)  
   - edit the `nano_photos_provider2.cfg` file for custom settings  
 
@@ -45,7 +45,7 @@ Example:
 
 ```js
     jQuery(document).ready(function () {
-      jQuery("#nanoGallery1").nanogallery2({
+      jQuery("#my_nanogallery").nanogallery2({
         thumbnailWidth:   'auto',
         thumbnailHeight:  150,
         kind:             'nano_photos_provider2',
