@@ -121,7 +121,7 @@ security | | |
 .  | allowOrigins | "*" | list of allowed domain (CORS)
 .  | | | Example: allowOrigins = "http://nanogallery2.nanostudio.org|https://nano.gallery"
   
-*: after changing any of these values, please delete all `_thumbnails` folder to refresh the cached data.  
+*: after changing any of these values, please delete all `_thumbnails` folders to refresh the cached data.  
   
   
 <br />

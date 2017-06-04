@@ -7,6 +7,16 @@ nanoPhotosProvider2 - nanogallery2 plugin
 ChangeLog 
 ------
 
+v1.0.0
+------
+- possibility to define the maximum image size used for display (full resolution version will be available for download)  
+- blurred image quality configurable  
+- enhanced cache management
+- enhanced security  
+- tags on photos  
+- metadata files: changed separator from ':' to '='  
+- configuration file: change section name 'thumbnail' to 'thumbnails'  
+
 v0.9.1
 ------
 - fixed upper case typo in filename
