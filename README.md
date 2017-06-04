@@ -1,4 +1,4 @@
-# nanoPhotosProvider2 [beta]
+# nanoPhotosProvider2 - v1.0.0
 ### :white_circle: add-on for nanogallery2
     
   
@@ -9,7 +9,7 @@ Main features:
 - compatible with all layouts: grid, justified and cascading
 - extraction of dominant colors (single color and gradient)  
 - supports photo albums  
-
+- easy to install and maintain - only flat files / no database
 
 To be used as an add-on for nanogallery2 (http://nanogallery2.nanostudio.org).
 
@@ -60,14 +60,17 @@ Example:
 ##### :three: Step 3: test your page to see the result ;-)
 
 <br />
-
-  ##### :four: Step 4: add/change content
+  
+##### :four: Step 4: add/change content
 Add files and folders, or renaname them.
 Please note that the generated thumbnails are never purged, so you may delete the `_thumbnails` folders to force a new generation.
   
   
+### :white_circle: IDs
+Filenames and folder names are used as IDs. So if you rename an image or folder, previous used links to albums and/or images will no longer work.
+
   
-### :white_circle: Title, description and ID
+### :white_circle: Title, description, tags
 
 There are 2 ways to define the thumbnails title and description  
 - in the filename or foldername  
@@ -75,12 +78,16 @@ The foldername or filename (without extension) are used as title.
 A description can be added by using the `$$` separator.  
   
 - in an external file  
-With the same name as the image, with the extension '.txt'  
+With the same name as the image, with the extension '.txt' 
 Format:  
 ```
-title: this is my title
-description: this is my descritption
+  title= this is my title
+  description= this is my descritption
+  tags=tag1 tag2 tag3
 ```
+  
+- Tags are only supported in external files
+    
   
 ### :white_circle: Album covers  
 By default, the first image found in a folder will be used for the album cover image.  
@@ -94,16 +101,28 @@ Custom settings are defined in `nano_photos_provider2.cfg`
 Section | Option | default value | Description
 ------------ | ------------- | ------------ | -------------
 config  | | |   
-.  | fileExtensions | "jpg\|jpeg\|png\|gif" | Supported file extensions
+.  | fileExtensions | "jpg\|jpeg\|png\|gif" | Supported file extensions (separtor is \|)
 .  | contentFolder | "nano_photos_content" | Folder where albums and images are stored
 .  | sortOrder | "asc" | Filename sort order (asc or desc)
 .  | titleDescSeparator | "$$" | Separator between title and description in the filename or foldername
 .  | albumCoverDetector | "@@@@@" | Leading sequence in the filename of the image to be used as an album cover  
 .  | ignoreDetector | "_hidden" | Ignore photos/albums (folders) containing this sequence in their name
-thumbnail | | |   
-.  | JpegQuality | 85 | JPEG quality for the thumbnails
-
-
+images | | |   
+.  | maxSize* | 1900 | max. width/height of the displayed images
+.  | jpegQuality* | 85 | JPEG quality of the images
+thumbnails | | |   
+.  | jpegQuality* | 85 | JPEG quality for the thumbnails
+.  | blurredImageQuality* | 3 | quality of the blurred images (higher is better but slower)
+.  | allowedSizeValues | "" | list of allowed values for thumbnail image sizes  (separtor is \|)
+.  | | | Values should be the same as in your nanogallery2 settings
+.  | | | Example: allowedSizeValues = "100|150|300|auto"
+security | | |   
+.  | allowOrigins | "*" | list of allowed domain (CORS)
+.  | | | Example: allowOrigins = "http://nanogallery2.nanostudio.org|https://nano.gallery"
+  
+*: after changing any of these values, please delete all `_thumbnails` folder to refresh the cached data.  
+  
+  
 <br />
 ### :white_circle: Supported image formats
 JPEG, GIF and PNG.
@@ -111,23 +130,15 @@ JPEG, GIF and PNG.
 <br />
 
 ### :warning: Perfomances
-- Thumbnails are generated on first request and then cached on disk.
-- On first use, or after adding a large amount of new images, you may en encounter timeouts -> reload the page until you don't get any error. Generated data will then be cached.
+- Lowres images, thumbnails and blurred images are generated on first request and then cached on disk.
+- On first use, or after adding a large amount of new images, you may en encounter timeouts -> reload the page until you don't get any error. Generated data will then be cached, for faster access.
 
 
 ### :warning: SECURITY
-Generation of thumbnails could be missused for a DoS (Denial-of-service) attack.  
-It's highly recommanded to limit the use of nanoPhotosProvider2 to specific webservers.  
-This can, for example, be achivied with a `.htaccess` file:  
-```
-<Files "admin.php">
-  Order deny,allow
-  Deny from all
-  Allow from .*domain1\.com.*
-  Allow from .*domain2\.com.*
-</Files>
-```  
-
+Generation of thumbnails could be missused to satured the server disk space.  
+It's highly recommanded to limit accepted values for thumbnail sizes in the `nano_photos_provider2.cfg` configuration file.  
+  
+  
 ### :warning: Limitations
 - The nanogallery2 option `locationHash` should NOT be enabled if albums have more than 2 levels.  
   
@@ -138,6 +149,6 @@ Only for personal, non-profit organizations, or open source projects (without an
 
 
 ### :white_circle: Requirements
-* nanogallery2 >= v1.3 (http://nanogallery2.nanostudio.org)
+* nanogallery2 >= v1.4 (http://nanogallery2.nanostudio.org)
 * Webserver
 * PHP >= v5.2 with GD-Library

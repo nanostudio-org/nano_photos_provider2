@@ -5,19 +5,19 @@
  * This is an add-on for nanogallery2 (image gallery - http://nanogallery2.nanostudio.org).
  * This PHP application will publish your images and albums from a PHP webserver to nanogallery2.
  * The content is provided on demand, one album at one time.
- * Thumbnails are generated automatically.
+ * Thumbnails and blurred preview images are generated automatically.
  * 
  * License: GPLv3 for personal, non-profit organizations, or open source projects (without any kind of fee), you may use nanogallery2 for free. 
  * -------- ALL OTHER USES REQUIRE THE PURCHASE OF A COMMERCIAL LICENSE.
  *
  *
  * PHP 5.2+
- * @version       0.9.1
+ * @version       1.0.0
  * @author        Christophe BRISBOIS - http://www.brisbois.fr/
  * @Contributor   Ruplahlava - https://github.com/Ruplahlava
  * @Contributor   EelcoA  - https://github.com/EelcoA
  * @Contributor   eae710 - https://github.com/eae710
- * @copyright     Copyright 2015
+ * @copyright     Copyright 2015+
  * @license       GPL v3 and commercial
  * @link          https://github.com/nanostudio-org/nanoPhotosProvider2
  * @Support       https://github.com/nanostudio-org/nanoPhotosProvider2/issues
