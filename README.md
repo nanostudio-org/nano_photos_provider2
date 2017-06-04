@@ -7,7 +7,7 @@ Content is provided on demand when browsing albums in the gallery.
 Main features:
 - generates responsive thumbnails automatically  
 - compatible with all layouts: grid, justified and cascading
-- extraction of dominant colors (single color and gradient)  
+- extraction of dominant colors (single color and gradient/blurred image)  
 - supports photo albums  
 - easy to install and maintain - only flat files / no database
 
@@ -62,12 +62,12 @@ Example:
 <br />
   
 ##### :four: Step 4: add/change content
-Add files and folders, or renaname them.
+Add files and folders, or rename them.  
 Please note that the generated thumbnails are never purged, so you may delete the `_thumbnails` folders to force a new generation.
   
   
 ### :white_circle: IDs
-Filenames and folder names are used as IDs. So if you rename an image or folder, previous used links to albums and/or images will no longer work.
+Filenames and folder names are used as IDs. So if you rename an image or folder, previous used links to the renamed element will no longer work.
 
   
 ### :white_circle: Title, description, tags
@@ -76,6 +76,7 @@ There are 2 ways to define the thumbnails title and description
 - in the filename or foldername  
 The foldername or filename (without extension) are used as title.  
 A description can be added by using the `$$` separator.  
+`_` will replaced by `space`
   
 - in an external file  
 With the same name as the image, with the extension '.txt' 
@@ -115,7 +116,7 @@ thumbnails | | |
 .  | blurredImageQuality* | 3 | quality of the blurred images (higher is better but slower)
 .  | allowedSizeValues | "" | list of allowed values for thumbnail image sizes  (separtor is \|)
 .  | | | Values should be the same as in your nanogallery2 settings
-.  | | | Example: allowedSizeValues = "100|150|300|auto"
+.  | | | Example: allowedSizeValues = "100&#124;150&#124;300&#124;auto"
 security | | |   
 .  | allowOrigins | "*" | list of allowed domain (CORS)
 .  | | | Example: allowOrigins = "http://nanogallery2.nanostudio.org|https://nano.gallery"
