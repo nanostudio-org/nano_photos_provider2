@@ -125,9 +125,18 @@ security | | |
   
   
 <br />
+
 ### :white_circle: Supported image formats
 JPEG, GIF and PNG.
 
+<br />
+
+### :warning: Usage on LOCAL WEB SERVER
+Due to browser security features, `dataProvider` can not point to `localhost`, `127.0.0.1` or similar.
+Possible workaround:  
+- configure your server to allow CORS (see https://enable-cors.org/server.html),      
+- or install a browser extension to disable CORS checking
+  
 <br />
 
 ### :warning: Perfomances
