@@ -1,4 +1,4 @@
-# nanoPhotosProvider2 - v1.0.0
+# nanoPhotosProvider2 - v1.0.1
 ### :white_circle: add-on for nanogallery2
     
   
@@ -141,7 +141,7 @@ Possible workaround:
 
 ### :warning: Perfomances
 - Lowres images, thumbnails and blurred images are generated on first request and then cached on disk.
-- On first use, or after adding a large amount of new images, you may en encounter timeouts -> reload the page until you don't get any error. Generated data will then be cached, for faster access.
+- On first use, or after adding a large amount of new images, you may encounter timeouts -> reload the page until you don't get any error. Generated data will then be cached, for faster access.
 
 
 ### :warning: SECURITY
