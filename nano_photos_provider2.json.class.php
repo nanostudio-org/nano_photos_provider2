@@ -24,16 +24,16 @@ class galleryData
 
 class item
 {
-    public $src         = '';
-    public $title       = '';
-    public $description = '';
-    public $ID          = '';
-    public $albumID     = '0';
-    public $kind        = '';       // 'album', 'image'
-    public $t_url       = array();       // thumbnails URL
-    public $t_width     = array();       // thumbnails width
-    public $t_height    = array();       // thumbnails height
-    public $dc          = '#000';   // image dominant color
+    public $src         = '';             // image URL
+    public $title       = '';             // item title
+    public $description = '';             // item description
+    public $ID          = '';             // item ID
+    public $albumID     = '0';            // parent album ID
+    public $kind        = '';             // 'album', 'image'
+    public $t_url       = array();        // thumbnails URL
+    public $t_width     = array();        // thumbnails width
+    public $t_height    = array();        // thumbnails height
+    public $dc          = '#888';         // image dominant color
     // public $dcGIF       = '#000';   // image dominant color
 
 
@@ -67,21 +67,24 @@ class galleryJSON
         $this->albumID = '0';
       }
 
-      // thumbnail responsive sizes
-      $this->tn_size[wxs]   = $_GET['wxs'];
-      $this->tn_size[hxs]   = $_GET['hxs'];
-      $this->tn_size[wsm]   = $_GET['wsm'];
-      $this->tn_size[hsm]   = $_GET['hsm'];
-      $this->tn_size[wme]   = $_GET['wme'];
-      $this->tn_size[hme]   = $_GET['hme'];
-      $this->tn_size[wla]   = $_GET['wla'];
-      $this->tn_size[hla]   = $_GET['hla'];
-      $this->tn_size[wxl]   = $_GET['wxl'];
-      $this->tn_size[hxl]   = $_GET['hxl'];
+      $this->setConfig(self::CONFIG_FILE);
       
+      // thumbnail responsive sizes
+      $this->tn_size[wxs]   = $this->CheckThumbnailSize( $_GET['wxs'] );
+      $this->tn_size[hxs]   = $this->CheckThumbnailSize( $_GET['hxs'] );
+      $this->tn_size[wsm]   = $this->CheckThumbnailSize( $_GET['wsm'] );
+      $this->tn_size[hsm]   = $this->CheckThumbnailSize( $_GET['hsm'] );
+      $this->tn_size[wme]   = $this->CheckThumbnailSize( $_GET['wme'] );
+      $this->tn_size[hme]   = $this->CheckThumbnailSize( $_GET['hme'] );
+      $this->tn_size[wla]   = $this->CheckThumbnailSize( $_GET['wla'] );
+      $this->tn_size[hla]   = $this->CheckThumbnailSize( $_GET['hla'] );
+      $this->tn_size[wxl]   = $this->CheckThumbnailSize( $_GET['wxl'] );
+      $this->tn_size[hxl]   = $this->CheckThumbnailSize( $_GET['hxl'] );
+      
+      
+
       
       $this->data           = new galleryData();
-      $this->setConfig(self::CONFIG_FILE);
       $this->data->fullDir  = ($this->config['contentFolder']) . ($this->album);
 
       $lstImages = array();
@@ -125,8 +128,65 @@ class galleryJSON
 
       $response = array('nano_status' => 'ok', 'nano_message' => '', 'album_content' => array_merge($lstAlbums, $lstImages));
 
-      // return the data
+      $this->SendData($response);
+    }
+    
+    /**
+     * CHECK IF THUMBNAIL SIZE IS ALLOWED (if not allowed: send error message and exit)
+     * 
+     * @param string $size
+     * @return boolean
+     */
+    protected function CheckThumbnailSize( $size )
+    {
+      if( $this->config['thumbnails']['allowedSizeValues'] == "" ) {
+        return $size;
+      }
+      
+      $s=explode('|', $this->config['thumbnails']['allowedSizeValues']);
+      if( is_array($s) ) {
+        foreach($s as $one) {
+          $one = trim($one);
+          if( $one == $size ) {
+            return $size;
+          }
+        }
+      }
+      
+      $response = array( 'nano_status' => 'error', 'nano_message' => 'requested thumbnail size not allowed: '. $size );
+      $this->SendData($response);
+      exit;
+      
+    }
+    
+
+    
+    /**
+     * SEND THE RESPONSE BACK
+     * 
+     * @param string $response
+     */
+    protected function SendData( $response )
+    {
+      // set the Access-Control-Allow-Origin header
+      $h=explode('|', $this->config['security']['allowOrigins']);
+      $cnt=0;
+      if( is_array($h) ) {
+        foreach($h as $one) {
+          $one = trim($one);
+          $overwrite = false;
+          if( $cnt == 0 ) {
+            $overwrite=true;
+          }
+          header('Access-Control-Allow-Origin: ' . $one , $overwrite);
+          $cnt++;
+        }
+      }
+      
+      // set the content-type header
       header('Content-Type: application/json; charset=utf-8');
+    
+      // return the data
       $output = json_encode($response);     // UTF-8 encoding is mandatory
       if (isset($_GET['jsonp'])) {
         // return in JSONP
@@ -135,9 +195,8 @@ class galleryJSON
         // return in JSON
         echo $output;
       }
-    }
-
     
+    }
     
     protected function setConfig($filePath)
     {
@@ -150,9 +209,41 @@ class galleryJSON
       $this->config['titleDescSeparator']     = $config['config']['titleDescSeparator'];
       $this->config['albumCoverDetector']     = $config['config']['albumCoverDetector'];
       $this->config['ignoreDetector']         = strtoupper($config['config']['ignoreDetector']);
+
+      // images
+      $this->config['images']['maxSize'] = 0;
+      $ms = $config['images']['maxSize'];
+      if( ctype_digit(strval($ms)) ){
+        $this->config['images']['maxSize'] = $ms;
+      }
+      $iq = $config['images']['jpegQuality'];
+      $this->config['images']['jpegQuality'] = 85; // default jpeg quality
+      if( ctype_digit(strval($iq)) ){
+        $this->config['images']['jpegQuality'] = $iq;
+      }
       
       // thumbnails
-      $this->config['thumbnail']['JpegQuality']         = $config['thumbnail']['JpegQuality'];
+      $tq = $config['thumbnails']['jpegQuality'];
+      $this->config['thumbnails']['jpegQuality'] = 85; // default jpeg quality
+      if( ctype_digit(strval($tq)) ){
+        $this->config['thumbnails']['jpegQuality'] = $tq;
+      }
+
+      $tbq = $config['thumbnails']['blurredImageQuality'];
+      $this->config['thumbnails']['blurredImageQuality'] = 3; // default blurred image quality
+      if( ctype_digit(strval($tbq)) ){
+        $this->config['thumbnails']['blurredImageQuality'] = $tbq;
+      }
+
+      $asv = trim($config['thumbnails']['allowedSizeValues']);
+      if( $asv != '' ) {
+         $this->config['thumbnails']['allowedSizeValues']=$asv;
+      }
+      
+
+      
+      // security
+      $this->config['security']['allowOrigins'] = $config['security']['allowOrigins'];
     }
 
     /**
@@ -238,6 +329,103 @@ class galleryJSON
 
 
     /**
+     * RETRIEVE ONE IMAGE'S DISPLAY URL
+     * 
+     * @param type $baseFolder
+     * @param type $filename
+     */
+    protected function GetImageDisplayURL( $baseFolder, $filename )
+    {
+    
+      if( $this->config['images']['maxSize'] < 100 ) {
+        return '';
+      }
+
+      if (!file_exists( $baseFolder . '_thumbnails' )) {
+        mkdir( $baseFolder . '_thumbnails', 0755, true );
+      }
+
+      
+      $lowresFilename = $baseFolder . '_thumbnails/' . $filename;
+      
+      if (file_exists($lowresFilename)) {
+        if( filemtime($lowresFilename) > filemtime($baseFolder . $filename) ) {
+          // original image file is older as the image use for display
+          $size = getimagesize($lowresFilename);
+          $this->currentItem->imgWidth  = $imgSize[0];
+          $this->currentItem->imgHeight = $imgSize[1];
+          return rawurlencode($this->CustomEncode($lowresFilename));
+        }
+      }
+
+      $size = getimagesize($baseFolder . $filename);
+
+      switch ($size['mime']) {
+        case 'image/jpeg':
+          $orgImage = imagecreatefromjpeg($baseFolder . $filename);
+          break;
+        case 'image/gif':
+          $orgImage = imagecreatefromgif($baseFolder . $filename);
+          break;
+        case 'image/png':
+          $orgImage = imagecreatefrompng($baseFolder . $filename);
+          break;
+        default:
+          return false;
+          break;
+      }
+
+      $width  = $size[0];
+      $height = $size[1];
+
+      if( $width <= $this->config['images']['maxSize'] && $height <= $this->config['images']['maxSize'] ) {
+        // original image is smaller than max size -> return original file
+        $this->currentItem->imgWidth  = $width;
+        $this->currentItem->imgHeight = $height;
+        return rawurlencode($this->CustomEncode($baseFolder . $filename));
+      }
+      
+      $newWidth = $width;
+      $newHeight = $height;
+      if( $width > $height ) {
+        if( $width > $this->config['images']['maxSize'] ) {
+          $newWidth = $this->config['images']['maxSize'];
+          $newHeight = $this->config['images']['maxSize'] / $width * $height;
+        }
+      }
+      else {
+        if( $height > $this->config['images']['maxSize'] ) {
+          $newHeight = $this->config['images']['maxSize'];
+          $newWidth = $this->config['images']['maxSize'] / $height * $width;
+        }
+      }
+      
+      $display_image = imagecreatetruecolor($newWidth, $newHeight);
+
+      // Resize
+      imagecopyresampled($display_image, $orgImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+      // save to disk
+      switch ($size['mime']) {
+        case 'image/jpeg':
+          imagejpeg($display_image, $lowresFilename, $this->config['images']['jpegQuality'] );
+          break;
+        case 'image/gif':
+          imagegif($display_image, $lowresFilename);
+          break;
+        case 'image/png':
+          imagepng($display_image, $lowresFilename, 1);
+          break;
+      }
+
+      $this->currentItem->imgWidth  = $newWidth;
+      $this->currentItem->imgHeight = $newHeight;
+      return rawurlencode($this->CustomEncode($lowresFilename));
+
+    }
+
+    
+    /**
      * RETRIEVE ONE IMAGE'S THUMBNAILS
      * 
      * @param type $baseFolder
@@ -246,11 +434,12 @@ class galleryJSON
      */
     protected function GetThumbnail2( $baseFolder, $filename )
     {
-        
+
       $s  = array( 'xs',   'sm',   'me',   'la',   'xl'  );
       $sw = array( 'wxs',  'wsm',  'wme',  'wla',  'wxl' );
       $sh = array( 'hxs',  'hsm',  'hme',  'hla',  'hxl' );
       for( $i = 0; $i < count($s) ; $i++ ) {
+
         $pi=pathinfo($filename);
         $tn= $pi['filename'] . '_' . $this->tn_size[$sw[$i]] . '_' . $this->tn_size[$sh[$i]] . '.' . $pi['extension'];
         if ( $this->GenerateThumbnail2($baseFolder, $filename, $tn, $this->tn_size[$sw[$i]], $this->tn_size[$sh[$i]], $i ) == true ) {
@@ -261,7 +450,6 @@ class galleryJSON
           $this->currentItem->t_url[$i]= $this->CustomEncode($baseFolder . $filename);
         }
       }
-        
     }
     
     /**
@@ -353,9 +541,8 @@ class galleryJSON
      */
     protected function GenerateThumbnail2($baseFolder, $imagefilename, $thumbnailFilename, $thumbWidth, $thumbHeight, $s)
     {
-
       if (!file_exists( $baseFolder . '_thumbnails' )) {
-        mkdir( $baseFolder . '_thumbnails', 0777, true );
+        mkdir( $baseFolder . '_thumbnails', 0755, true );
       }
         
       $generateThumbnail = true;
@@ -366,9 +553,17 @@ class galleryJSON
         }
       }
       
+      $generateDominantColors = true;
+      if( $s != 0 ) {
+        $generateDominantColors=false;
+      }
+      else {
+        $generateDominantColors= ! $this->GetDominantColors($baseFolder . $imagefilename, $baseFolder . '_thumbnails/' . $thumbnailFilename . '.data');
+      }
+     
       $size = getimagesize($baseFolder . $imagefilename);
       
-      if( $generateThumbnail == true || $s == 0 ) {
+      if( $generateThumbnail == true || $generateDominantColors == true ) {
         switch ($size['mime']) {
           case 'image/jpeg':
             $orgImage = imagecreatefromjpeg($baseFolder . $imagefilename);
@@ -444,11 +639,7 @@ class galleryJSON
       if( $generateThumbnail == true ) {
         switch ($size['mime']) {
           case 'image/jpeg':
-            $q=$this->config['thumbnail']['JpegQuality'];
-            if( ! ctype_digit(strval($q)) ){
-              $q=90;    // default jpeg quality
-            }
-            imagejpeg($thumb, $baseFolder . '/_thumbnails/' . $thumbnailFilename, $q);
+            imagejpeg($thumb, $baseFolder . '/_thumbnails/' . $thumbnailFilename, $this->config['thumbnails']['jpegQuality'] );
             break;
           case 'image/gif':
             imagegif($thumb, $baseFolder . '/_thumbnails/' . $thumbnailFilename);
@@ -459,9 +650,9 @@ class galleryJSON
         }
       }
       
-      if( $s == 0 ) {
+      if( $generateDominantColors == true ) {
         // Dominant colorS -> GIF
-        $dc3 = imagecreate(3, 3);
+        $dc3 = imagecreate($this->config['thumbnails']['blurredImageQuality'], $this->config['thumbnails']['blurredImageQuality']);
         imagecopyresampled($dc3, $orgImage, 0, 0, 0, 0, 3, 3, $width, $height);
         ob_start(); 
         imagegif( $dc3 );
@@ -476,10 +667,60 @@ class galleryJSON
         $color = imagecolorsforindex($pixel, $rgb);
         $hex=sprintf('#%02x%02x%02x', $color[red], $color[green], $color[blue]);
         $this->currentItem->dc= $hex;
-        
+
+        // save to cache
+        $fdc = fopen($baseFolder . '_thumbnails/' . $thumbnailFilename . '.data', 'w');
+        if( $fdc ) { 
+          fwrite($fdc, 'dc=' . $hex . "\n");
+          fwrite($fdc, 'dcGIF=' . base64_encode( $image_data ));
+          fclose($fdc);
+        }
+        else {
+          // exit without dominant color
+          return false;
+        }
       }
 
       return true;
+    }
+
+    
+    protected function GetDominantColors($fileImage, $fileDominantColors)
+    {
+    
+      if (file_exists($fileDominantColors)) {
+        if( filemtime($fileDominantColors) < filemtime($fileImage) ) {
+          // image file is older as the dominant colors file
+          return false;
+        }
+
+        // read cached data
+        $cnt=0;
+        $myfile = fopen($fileDominantColors, "r");
+        if( $myfile ) { 
+          while(!feof($myfile)) {
+            $l=fgets($myfile);
+            $s=explode('=', $l);
+            if( is_array($s) ) {
+              $property=trim($s[0]);
+              $value=trim($s[1]);
+              if( $property != '' &&  $value != '' ) {
+                $this->currentItem->$property=$value;
+                $cnt++;
+              }
+            }
+          }
+          fclose($myfile);
+        }
+        
+        if( $cnt == 2 ) {
+          // ok, 2 values found
+          return true;
+        }
+      }
+      
+      return false;
+      
     }
 
     /**
@@ -522,13 +763,13 @@ class galleryJSON
       // the title (=filename) is the ID
       $oneItem->ID= $oneItem->title;
         
-        // read meta data from external file
+      // read meta data from external file (only images)
       if ($isImage) {
         if( file_exists( $this->data->fullDir . '/' . $filename . '.txt' ) ) {
           $myfile = fopen($this->data->fullDir . '/' . $filename . '.txt', "r") or die("Unable to open file!");
           while(!feof($myfile)) {
             $l=fgets($myfile);
-            $s=explode(':', $l);
+            $s=explode('=', $l);
             if( is_array($s) ) {
               $property=trim($s[0]);
               $value=trim($s[1]);
@@ -653,14 +894,19 @@ class galleryJSON
         // ONE IMAGE
         $this->currentItem->kind            = 'image';
         
-        $e                        = $this->GetMetaData($filename, true);
+        $e = $this->GetMetaData($filename, true);
         $this->currentItem->title           = $e->title;
         $this->currentItem->description     = $e->description;
-        $this->currentItem->src             = rawurlencode($this->CustomEncode($this->config['contentFolder'] . $this->album . '/' . $filename));
+        // $this->currentItem->src             = rawurlencode($this->CustomEncode($this->config['contentFolder'] . $this->album . '/' . $filename));
+        $this->currentItem->originalURL     = rawurlencode($this->CustomEncode($this->config['contentFolder'] . $this->album . '/' . $filename));
+        $this->currentItem->src             = $this->GetImageDisplayURL($this->data->fullDir, $filename);
+        if( $this->currentItem->src == '' ) {
+          $this->currentItem->src = $this->currentItem->originalURL;
+          $imgSize = getimagesize($this->data->fullDir . '/' . $filename);
+          $this->currentItem->imgWidth        = $imgSize[0];
+          $this->currentItem->imgHeight       = $imgSize[1];
+        }
 
-        $imgSize                  = getimagesize($this->data->fullDir . '/' . $filename);
-        $this->currentItem->imgWidth        = $imgSize[0];
-        $this->currentItem->imgHeight       = $imgSize[1];
         $this->GetThumbnail2($this->data->fullDir, $filename);
         $this->currentItem->albumID         = rawurlencode($this->albumID);
         if ($this->albumID == '0' || $this->albumID == '') {
@@ -674,7 +920,7 @@ class galleryJSON
         // ONE ALBUM
         $this->currentItem->kind            = 'album';
 
-        $e                        = $this->GetMetaData($filename, false);
+        $e = $this->GetMetaData($filename, false);
         $this->currentItem->title           = $e->title;
         $this->currentItem->description     = $e->description;
 
