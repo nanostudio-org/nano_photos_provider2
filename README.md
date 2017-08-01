@@ -1,5 +1,5 @@
 # nanoPhotosProvider2
-### :white_circle: add-on for nanogallery2
+### add-on for nanogallery2
     
   
 Publish your self-hosted photos simply and automatically to nanogallery2.  
@@ -25,7 +25,7 @@ To be used as an add-on for nanogallery2 (http://nanogallery2.nanostudio.org).
 nanoPhotosProvider2 is open source and licensed under GPLv3 license.
 
 
-### :white_circle: Requirements
+### Requirements
 * nanogallery2 >= v1.4 (http://nanogallery2.nanostudio.org)
 * Webserver
 * PHP > v5.2 with GD-Library enabled
