@@ -11,6 +11,14 @@
  * License: For personal, non-profit organizations, or open source projects (without any kind of fee), you may use nanogallery2 for free. 
  * -------- ALL OTHER USES REQUIRE THE PURCHASE OF A COMMERCIAL LICENSE.
  *
+ * PHP 5.2+
+ * @version       1.1.0
+ * @author        Christophe BRISBOIS - http://www.brisbois.fr/
+ * @copyright     Copyright 2015+
+ * @license       GPL v3 and commercial
+ * @link          https://github.com/nanostudio-org/nanoPhotosProvider2
+ * @Support       https://github.com/nanostudio-org/nanoPhotosProvider2/issues
+ *
  */
 
 require './nano_photos_provider2.encoding.php';
@@ -70,19 +78,16 @@ class galleryJSON
       $this->setConfig(self::CONFIG_FILE);
       
       // thumbnail responsive sizes
-      $this->tn_size[wxs]   = $this->CheckThumbnailSize( $_GET['wxs'] );
-      $this->tn_size[hxs]   = $this->CheckThumbnailSize( $_GET['hxs'] );
-      $this->tn_size[wsm]   = $this->CheckThumbnailSize( $_GET['wsm'] );
-      $this->tn_size[hsm]   = $this->CheckThumbnailSize( $_GET['hsm'] );
-      $this->tn_size[wme]   = $this->CheckThumbnailSize( $_GET['wme'] );
-      $this->tn_size[hme]   = $this->CheckThumbnailSize( $_GET['hme'] );
-      $this->tn_size[wla]   = $this->CheckThumbnailSize( $_GET['wla'] );
-      $this->tn_size[hla]   = $this->CheckThumbnailSize( $_GET['hla'] );
-      $this->tn_size[wxl]   = $this->CheckThumbnailSize( $_GET['wxl'] );
-      $this->tn_size[hxl]   = $this->CheckThumbnailSize( $_GET['hxl'] );
-      
-      
-
+      $this->tn_size['wxs']   = strtolower($this->CheckThumbnailSize( $_GET['wxs'] ));
+      $this->tn_size['hxs']   = strtolower($this->CheckThumbnailSize( $_GET['hxs'] ));
+      $this->tn_size['wsm']   = strtolower($this->CheckThumbnailSize( $_GET['wsm'] ));
+      $this->tn_size['hsm']   = strtolower($this->CheckThumbnailSize( $_GET['hsm'] ));
+      $this->tn_size['wme']   = strtolower($this->CheckThumbnailSize( $_GET['wme'] ));
+      $this->tn_size['hme']   = strtolower($this->CheckThumbnailSize( $_GET['hme'] ));
+      $this->tn_size['wla']   = strtolower($this->CheckThumbnailSize( $_GET['wla'] ));
+      $this->tn_size['hla']   = strtolower($this->CheckThumbnailSize( $_GET['hla'] ));
+      $this->tn_size['wxl']   = strtolower($this->CheckThumbnailSize( $_GET['wxl'] ));
+      $this->tn_size['hxl']   = strtolower($this->CheckThumbnailSize( $_GET['hxl'] ));
       
       $this->data           = new galleryData();
       $this->data->fullDir  = ($this->config['contentFolder']) . ($this->album);
@@ -108,7 +113,8 @@ class galleryJSON
           }
           else {
             // it's a folder
-            $files = glob($this->data->fullDir . $filename."/*.{".str_replace("|",",",$this->config['fileExtensions'])."}", GLOB_BRACE);    // to check if folder contains images
+            //$files = glob($this->data->fullDir . $filename."/*.{".str_replace("|",",",$this->config['fileExtensions'])."}", GLOB_BRACE);    // to check if folder contains images - warning - glob is not supported by all platforms
+            $files = preg_grep('~\.('.$this->config['fileExtensions'].')$~', scandir($this->data->fullDir . $filename));     // to check if folder contains images
             if ($filename != '.' &&
                     $filename != '..' &&
                     $filename != '_thumbnails' &&
@@ -139,7 +145,8 @@ class galleryJSON
      */
     protected function CheckThumbnailSize( $size )
     {
-      if( $this->config['thumbnails']['allowedSizeValues'] == "" ) {
+      if( !array_key_exists("allowedSizeValues",$this->config['thumbnails']) || $this->config['thumbnails']['allowedSizeValues'] == "" ) {
+        // no size restriction
         return $size;
       }
       
@@ -210,6 +217,11 @@ class galleryJSON
       $this->config['albumCoverDetector']     = $config['config']['albumCoverDetector'];
       $this->config['ignoreDetector']         = strtoupper($config['config']['ignoreDetector']);
 
+      // memory usage
+      if( $config['memory']['unlimited'] == true ) {
+        ini_set('memory_limit', '-1');
+      }
+      
       // images
       $this->config['images']['maxSize'] = 0;
       $ms = $config['images']['maxSize'];
@@ -352,8 +364,8 @@ class galleryJSON
         if( filemtime($lowresFilename) > filemtime($baseFolder . $filename) ) {
           // original image file is older as the image use for display
           $size = getimagesize($lowresFilename);
-          $this->currentItem->imgWidth  = $imgSize[0];
-          $this->currentItem->imgHeight = $imgSize[1];
+          $this->currentItem->imgWidth  = $size[0];
+          $this->currentItem->imgHeight = $size[1];
           return rawurlencode($this->CustomEncode($lowresFilename));
         }
       }
@@ -600,8 +612,10 @@ class galleryJSON
         }
 
         // thumbnail image size
-        $this->currentItem->t_width[$s]=$newWidth;
-        $this->currentItem->t_height[$s]=$newHeight;
+        // $this->currentItem->t_width[$s]=$newWidth;
+        // $this->currentItem->t_height[$s]=$newHeight;
+        $this->currentItem->t_width[$s]=$thumbWidth;
+        $this->currentItem->t_height[$s]=$thumbHeight;
 
         if( $generateThumbnail == true ) {
           $thumb = imagecreatetruecolor($thumbWidth, $thumbHeight);
@@ -665,7 +679,7 @@ class galleryJSON
         imagecopyresampled($pixel, $orgImage, 0, 0, 0, 0, 1, 1, $width, $height);
         $rgb = imagecolorat($pixel, 0, 0);
         $color = imagecolorsforindex($pixel, $rgb);
-        $hex=sprintf('#%02x%02x%02x', $color[red], $color[green], $color[blue]);
+        $hex=sprintf('#%02x%02x%02x', $color['red'], $color['green'], $color['blue']);
         $this->currentItem->dc= $hex;
 
         // save to cache
@@ -893,13 +907,13 @@ class galleryJSON
       if ( $kind == 'IMAGE' ) {
         // ONE IMAGE
         $this->currentItem->kind            = 'image';
-        
         $e = $this->GetMetaData($filename, true);
         $this->currentItem->title           = $e->title;
         $this->currentItem->description     = $e->description;
         // $this->currentItem->src             = rawurlencode($this->CustomEncode($this->config['contentFolder'] . $this->album . '/' . $filename));
         $this->currentItem->originalURL     = rawurlencode($this->CustomEncode($this->config['contentFolder'] . $this->album . '/' . $filename));
         $this->currentItem->src             = $this->GetImageDisplayURL($this->data->fullDir, $filename);
+
         if( $this->currentItem->src == '' ) {
           $this->currentItem->src = $this->currentItem->originalURL;
           $imgSize = getimagesize($this->data->fullDir . '/' . $filename);
