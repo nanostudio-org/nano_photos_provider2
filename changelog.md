@@ -1,7 +1,7 @@
 nanoPhotosProvider2 - add-on for nanogallery2
 ===========
 
-**Visit nanoPhotosProvider2 homepage for usage details: [https://github.com/nanostudio-org/nano_photos_provider2](https://github.com/nanostudio-org/nano_photos_provider2)**
+**Visit nanoPhotosProvider2 homepage for usage details: [http://nanophotosprovider2.nanostudio.org/](http://nanophotosprovider2.nanostudio.org/)**
 
 
 
