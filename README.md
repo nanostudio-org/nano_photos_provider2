@@ -1,5 +1,5 @@
 # nanoPhotosProvider2
-### add-on for nanogallery2
+### Add-on for [nanogallery2](http://nanogallery2.nanostudio.org).
     
   
 Publish your self-hosted photos simply and automatically to nanogallery2.  
@@ -10,8 +10,6 @@ Main features:
 - extraction of dominant colors (single color and gradient/blurred image)  
 - supports photo albums  
 - easy to install and maintain - only flat files / no database
-
-To be used as an add-on for nanogallery2 (http://nanogallery2.nanostudio.org).
   
 <br>
 <br>
