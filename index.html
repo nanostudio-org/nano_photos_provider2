@@ -1,1 +1,942 @@
-hello world
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html>
+
+<head>
+  <title>nanoPhotosProvider2 - PHP application for publishing photo galleries with nanogallery2</title>
+  <meta charset="utf-8">
+  <meta name="description" content="nanoPhotosProvider2 - PHP application for publishing photo galleries with nanogallery2">
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="nanoPhotosProvider2">
+  <meta property="og:description" content="nanoPhotosProvider2 - PHP application for publishing photo galleries with nanogallery2">
+  <meta property="og:image" content="http://nanophotosprovider2.nanostudio.org/img/nanophotosprovider2_logo.png">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="nanoPhotosProvider2">
+  <meta name="twitter:description" content="nanoPhotosProvider2 - PHP application for publishing photo galleries with nanogallery2">
+  <meta name="twitter:image" content="http://nanophotosprovider2.nanostudio.org/img/nanophotosprovider2_logo.png">
+
+  <link rel="icon" href="img/favicon.ico?v=1" />
+
+  <link href="https://fonts.googleapis.com/css?family=Signika+Negative" rel="stylesheet">
+ 
+  <!-- #################################################################################################################### -->
+  <!-- jQuery                                                                                                               -->
+  <script type="text/javascript" src="vendors/jquery-1.12.4.min.js"></script>
+  <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>  -->
+  <!-- #################################################################################################################### -->
+
+
+  <!-- BOOTSTRAP -->
+  <link href="vendors/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <script src="vendors/bootstrap/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="vendors/font-awesome/css/font-awesome.min.css" />
+
+  
+  <style>
+    body { font-size:1.3em; color:#111; }
+    p { font-size:1.3em; }
+    td { font-size:1.2em; }
+    .ngy2documentation p { font-size:1.1em; }
+    .ngy2documentation td { font-size:1.1em; }
+    .ngy2documentation blockquote { font-size:1.1em; }
+   
+    * { font-family: 'Signika Negative', sans-serif; }
+    h1 {
+      border-left : 5px solid #499195;
+      padding-left: 10px;
+    }
+    .footer {
+      margin: 0;
+    }
+    
+
+    blockquote {
+      color: #000;
+      background-color: #AEDADC;
+      border-color: #499195;
+      padding-top: 25px;
+      padding-bottom: 25px;
+    }
+    
+    /***** TOP NAVIGATION BAR *****/
+    .navbar * { font-weight: bold; }
+    .navbar-inverse .navbar-nav>li>a { 
+      color: #fff;
+      padding-bottom: 5px;
+    }
+    .navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:focus, .navbar-inverse .navbar-nav>.active>a:hover {
+      color: #23CB99;
+      border-bottom: 2px solid #23CB99;
+    }
+    .navbar-inverse .navbar-brand {
+      color: #fff;
+      display: inline-flex;
+      display: -webkit-inline-flex;
+    }
+
+    .navbar-inverse {
+      background-color: #0F1934;
+    }
+    
+    .navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:focus, .navbar-inverse .navbar-nav>.active>a:hover {
+      background-color: #0F1934;
+    }
+    
+    /***** NANOGALLERY2 COLORS *****/
+
+    
+    /* palette (bleuté)- fond clair
+
+    logo + menu + icon button : 23CB99 (plus clair: 46D6AB)
+    base: 499295
+    AEDADC
+    76B6B9
+    2E7C7F
+    19676B
+
+    0F4548
+    0E4144
+
+    background: #0F1934
+    buttons: #3C4B5B
+    */    
+    
+    .ngy2_bgdark {
+      background-color: #0F1934;
+      margin: 0;
+    }
+
+    .ngy2_bgdark p ,
+    .ngy2_bgdark .lead {
+      color : #fff;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      color : #499295
+    }
+    .ngy2_bgdark h1, .ngy2_bgdark h2, .ngy2_bgdark h3, .ngy2_bgdark h4, .ngy2_bgdark h5, .ngy2_bgdark h6 {
+      color : #76B6B9;
+    }
+
+    a {
+      color: #499295;
+      text-decoration: none;
+    }    
+
+    .ngy2_color1 {
+      color: #499295;
+    }
+    .ngy2_color2 {
+      color: #23CB99;
+    }
+
+    .ngy2_bgdark .btn-primary {
+      color: #fff;
+      background-color: #3C4B5B;
+      border-color: #3C4B5B;
+    }
+
+    /* ### LOGO ### */
+    .ngy2_logo {
+      border-left : none;
+      padding-left: 0;
+      color: #fff !important;
+      font-weight: bold;
+    }
+
+    /* ### BUTTON SUCCESS ### */
+    .btn-success, .btn-success:visited {
+      color: #fff;
+      background-color: #23CB99;
+      border-color: #23CB99;
+    }
+    .btn-success:hover, .btn-success:active, .btn-success:focus, .btn-success:active:focus {
+      color: #fff;
+      background-color: #46D6AB;
+      border-color: #46D6AB;
+    }
+
+    .ngy2_bgdark .btn-success, .ngy2_bgdark .btn-success:visited {
+      color: #fff;
+      background-color: #499295;
+      border-color: #499295;
+    }
+    .ngy2_bgdark .btn-success:hover, .ngy2_bgdark .btn-success:active, .ngy2_bgdark .btn-success:focus, .ngy2_bgdark .btn-success:active:focus {
+      color: #fff;
+      background-color: #76B6B9;
+      border-color: #76B6B9;
+    }
+    
+
+    
+    /* DIAGONALS */
+    .svg-diag {
+      display:  block;
+      width:    100%;
+      height:   90px;
+      index:    -1;
+      margin-bottom: -1px;
+    }    
+    
+    .ngy2_version {
+      color: #ddd;
+      font-size:0.6em; 
+      padding: 0px;
+    }
+
+    
+    
+    /***** TOP CUSTOM JUMBOTRON *****/
+    .jumbotronNGY2 {
+      padding-top:0px;
+    }
+    
+    /***** CUSTOM JUMBOTRON *****/
+    .jumbotron {
+      margin-bottom: 0;
+    }
+    
+    
+    /***** VERTICAL NAVIGATION BAR (documentation) *****/
+    #ngy2_vert_nav {
+      border-left: 4px solid #499295;
+    }
+    
+    #ngy2_vert_nav_style .nav > li > a {
+        position: relative;
+        display: block;
+        padding: 2px 5px;
+        color:#000;
+    }    
+    #ngy2_vert_nav_style .nav .active {
+      font-weight: bold;
+      border-left: 4px solid #499295;
+      background-color: #f0f0f0;
+    }
+    #ngy2_vert_nav_style .nav .active a{
+      color:#499295;
+      font-size:1.2em;
+    }
+
+    #ngy2_vert_nav_style .nav .nav {
+      display: none;
+    }
+
+    #ngy2_vert_nav_style .nav .active .nav {
+      display: block;
+    }
+
+    #ngy2_vert_nav_style .nav .nav a {
+      font-weight: normal;
+      font-size: .85em;
+    }
+
+    #ngy2_vert_nav_style .nav .nav span {
+      margin: 0 5px 0 2px;
+    }
+
+    #ngy2_vert_nav_style.nav .nav .active a,
+    #ngy2_vert_nav_style .nav .nav .active:hover a,
+    #ngy2_vert_nav_style .nav .nav .active:focus a {
+      font-weight: bold;
+      padding-left: 30px;
+      border-left: 5px solid black;
+    }
+
+    #ngy2_vert_nav_style .nav .nav .active span,
+    #ngy2_vert_nav_style .nav .nav .active:hover span,
+    #ngy2_vert_nav_style .nav .nav .active:focus span {
+      display: none;
+    }
+
+    .affix {
+      top: 60px;
+      width: 213px;
+    }
+
+    @media (min-width: 1200px) {
+      .affix {
+        width: 263px;
+      }         
+    }    
+    
+    </style>
+
+  <!-- Asynchronous Google Analytics snippet -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-39069349-6', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+  
+</head>
+
+
+<body data-spy="scroll" data-target=".scrollspy" style="position: relative;">
+
+
+
+  <!-- ###################### -->
+  <!-- ##### END HEADER ##### -->
+  <!-- ###################### -->
+
+  
+  
+  
+  <!-- ### LOGO ### -->
+  <div class="jumbotron ngy2_bgdark">
+    <div class="container ">
+      <br><br>
+      <div class="row" >
+        <div class="col-md-6 text-center">
+          <!-- <img src="img/nanogallery2.png" alt="nanogallery2" style="max-width:90%;"> -->
+          <h1 id="ngy2logo" class="ngy2_logo" style="opacity:1;">nanoPhotosProvider2 <img src="img/nanophotosprovider2_logo.png" alt="nanogallery2" style="max-width:40%;"></h1>
+        </div>
+        <div class="col-md-6 text-center" id="ngy2logo2" style="opacity:1;">
+          <br>
+          <br>
+          <br>
+          <br>
+          <h3 style="color:#fff;margin-top:0px;">Publish your self-hosted photos simply and automatically to nanogallery2.</h3><br>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ### LOGO ### -->
+
+  
+  <!-- ########################### -->
+  <!-- ##### END LOGO INDEX  ##### -->
+  <!-- ########################### -->
+
+
+ 
+
+  <div class="jumbotron ngy2_bgdark">
+    <div class="container ">
+      <div class="row text-right" >
+        <div class="col-md-10" ></div>
+        <div class="col-md-2" >
+        </div>
+      </div>
+    </div>
+  </div>
+  <svg class="svg-diag" style="background-color:#0F1934;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none">
+    <polygon points="100 0 100 10 -50 10" style="fill:#fff;"/>
+  </svg>
+
+  
+  <div class="container">
+    <div class="row text-center" >
+      <div class="col-md-1" ></div>
+      <div class="col-md-10" >
+        <br><br><br>
+        <!-- <h1 style="border-left:0px;padding-left:0px;"><b>nanogallery2</b> is focused on performance and on providing the best experience for user with any device.</h1> -->
+        <h1 style="border-left:0px;padding-left:0px;">PHP application for publishing your photos from your web server.</h1>
+        <br><br>
+      </div>
+      <div class="col-md-1" ></div>
+    </div>
+
+    <br><br><br><br><br><br>
+
+
+
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h2>
+          Blurred image preview during thumbnail download.
+        </h2>
+        <br><br>
+        <br><br>
+        <img src="img/npp2_tn_blurred2.jpg">
+        <img src="img/npp2_tn2.jpg">
+      </div>
+    </div>
+    
+    <br><br><br><br><br><br>
+    <br><br><br><br><br><br>
+    
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h2>
+          Support all nanogallery2 basic layouts and their variants.
+        </h2>
+      </div>
+    </div>
+    <br><br>
+    <br><br>
+    <div class="row">
+      <div class="col-md-4 text-center">
+        <img src="img/npp2_layout_grid.jpg" style="width:340px;">
+        <h4>
+          grid layout
+        </h4>
+        <h5>
+          fixed width and height
+        </h5>
+      </div>
+      <div class="col-md-4 text-center">
+        <img src="img/npp2_layout_justified2.jpg" style="width:340px;">
+        <h4>
+          justified layout
+        </h4>
+        <h5>
+          fixed height, variable width
+        </h5>
+      </div>
+      <div class="col-md-4 text-center">
+        <img src="img/npp2_layout_cascading.jpg" style="width:340px;">
+        <h4>
+          cascading layout
+        </h4>
+        <h5>
+          fixed width, variable height
+        </h5>
+      </div>
+    </div>
+
+    <br><br><br><br><br><br>
+    <br><br><br><br><br><br>
+    
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h2>
+          Automatic generation of responsive thumbnails
+        </h2>
+        <br><br>
+        <br><br>
+        <img src="img/npp2_tn_s1.jpg">
+        <img src="img/npp2_tn_s2.jpg">
+        <img src="img/npp2_tn_s3.jpg">
+        <img src="img/npp2_tn.png">
+      </div>
+    </div>
+    
+    
+    
+    <br><br><br><br><br><br>
+    <br><br><br><br><br><br>
+
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h2>
+          Supports photo albums.
+          <br>
+          Easy to install and maintain - no database, only flat files.
+          <br><br>
+          Add-on for <img src="img/nanogallery2s.png" alt="nanogallery2" style="height:60px;"> <a href="" target="_blank" >nanogallery2</a>.
+        </h2>
+      </div>
+    </div>
+  </div>
+  
+  <br><br><br><br><br><br>
+  <br><br><br><br><br><br>
+  
+  
+  <svg class="svg-diag" style="background-color:#fff;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none">
+    <polygon points="100 0 100 10 -50 10" style="fill:#eee;"/>
+  </svg>
+  <div class="jumbotron">
+    <div class="container">
+      <br><br><br><br>
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <a itemprop="downloadUrl" href="https://github.com/nanostudio-org/nano_photos_provider2/archive/v1.0.1.zip" class="btn btn-success btn-lg btn-block" ><i class="fa fa-download" aria-hidden="true"></i> download nanoPhotosProvider2</a>
+        </div>
+        <div class="col-md-4 text-center">
+          <a href="https://github.com/nanostudio-org/nano_photos_provider2/blob/master/changelog.md" class="btn btn-success btn-lg btn-block" target="_blank"><i class="fa fa-newspaper-o" aria-hidden="true"></i> &nbsp; view changelog</a>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="btn-group btn-group-justified">
+            <a href="https://github.com/nanostudio-org/nano_photos_provider2" class="btn btn-primary btn-lg btn-block" target="_blank"><i class="fa fa-github" aria-hidden="true"></i> view on github</a>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <p class="text-center"><br><b>latest release: nanoPhotosProvider2 <span itemprop="softwareVersion">v1.0.1</span> - <span itemprop="datePublished" content="2017-07-19">2017-07-19</span>
+            <br>
+            <br>
+            Get new release alerts by following @nanostudio_org &nbsp; 
+            <a href="https://twitter.com/nanostudio_org" type="button" class="btn btn-primary" target="_blank" style="background-color:#00aced;border:0px;"><i class="fa fa-twitter" aria-hidden="true"></i> &nbsp; follow @nanostudio_org</a>
+          </b></p>
+        </div>
+      </div>
+      
+      <br><br><br>
+
+    </div>
+      
+  </div>
+
+ 
+  <svg class="svg-diag" style="background-color:#eee;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none">
+    <polygon points="100 0 100 10 -50 10" style="fill:#0F1934;"/>
+  </svg>
+
+
+
+
+
+
+  <div class="jumbotron ngy2_bgdark">
+    <div class="container">
+      <div class="row text-center" >
+        <div class="col-md-1" ></div>
+        <div class="col-md-10" >
+          <h2>nanoPhotosProvider2 usage</h2>
+
+          <br><br><br><br>
+          <div style="color:#fff;" class="text-left lead">
+
+            <b><i class="fa fa-arrow-right" aria-hidden="true"></i> Step 1: installation</b>
+            <br><br>
+
+            On your webserver:
+            <br>
+            - create a folder named <b>nano_photos_provider2</b>
+            <br>
+            - in this folder:
+            <ul>
+              <li>
+                copy the files:
+                <ul>
+                  <li>nano_photos_provider2.php</li>
+                  <li>nano_photos_provider2.json.class.php</li>
+                  <li>nano_photos_provider2.cfg</li>
+                  <li>nano_photos_provider2.encoding.php</li>
+                </ul>
+              </li>
+              <li>
+                create a folder named <b>nano_photos_content</b>
+                <ul>
+                  <li>copy your photos there</li>
+                  <li>you can organize your photos in folders (= albums)</li>
+                </ul>
+              </li>
+            </ul>
+            <br><br><br>
+          
+            <b><i class="fa fa-arrow-right" aria-hidden="true"></i> Step 2: configure your HTML page</b>
+            <br><br>
+            <ul>
+              <li>The page can be located anywhere on your webserver.</li>
+              <li>Install and configure nanogallery2 (see <a href="http://nanogallery2.nanostudio.org/quickstart.html">http://nanogallery2.nanostudio.org)</a></li>
+              <li>Configure the call to the plugin:</li>
+              <li>
+                <ul>
+                  <li>Use the specific parameters: <b>kind</b> and <b>dataProvider</b></li>
+                  <li>kind: set value to 'nano_photos_provider2'</li>
+                  <li>dataProvider: URL to the nano_photos_provider2.php file installed in step 1</li>
+                </ul>
+              </li>
+            </ul>
+            Example:
+            <br><br>
+            <pre><code>
+            jQuery(document).ready(function () {
+              jQuery("#my_nanogallery").nanogallery2({
+                thumbnailWidth:   'auto',
+                thumbnailHeight:  150,
+                kind:             'nano_photos_provider2',
+                dataProvider:     'http://mywebsever.com/mypath/nano_photos_provider2/nano_photos_provider2.php',
+                locationHash:     false
+              });
+            });
+            </code></pre>
+
+            <br><br><br>
+            
+            <b><i class="fa fa-arrow-right" aria-hidden="true"></i> Step 3: test your page to see the result <i class="fa fa-smile-o" aria-hidden="true"></i></b>
+            <br><br><br>
+
+          
+          </div>
+        </div>
+        <div class="col-md-1" ></div>
+      </div>
+    </div>
+  </div>
+  <svg class="svg-diag" style="background-color:#0F1934;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none">
+    <polygon points="100 0 100 10 -50 10" style="fill:#fff;"/>
+  </svg>
+
+  
+  
+  <div class="container">
+    <br><br><br><br><br>
+    <div class="row ">
+      <div class="col-md-1"></div>
+      <div class="col-md-10 text-center">
+        <h2>Settings and configuration</h2>
+        <br><br><br><br><br><br>
+      </div>
+      <div class="col-md-1" ></div>
+    </div>
+    <div class="row text-center" >
+      <div class="col-md-1"></div>
+      <div class="col-md-10  text-left">
+        <span class="lead">
+        <b>Content management</b>
+        <br>
+        You can add images and folders, or rename them, in your content folder.
+        <br>
+        Please note that the generated thumbnails are never purged, so you may delete the <b>_thumbnails</b> folders to force a new generation.
+        <br><br><br>
+        
+        <b>Title, description, tags</b>
+        <br>
+        - Title
+        <br>
+        File names and folder names are used as title in nanogallery2.
+        <br>
+        The special caracter underscore '_' will be replaced by a white space.
+        <br><br>
+        - Description
+        <br>
+        A description can be defined in the file names or in the folder names. 
+        <br>
+        Use '$$' to separate title and description. Example: 'Berlin$$Brandenburger_Gate.jpg'
+        <br><br>
+        
+        - Metadata files
+        <br>
+        One metadata file can be optionally defined to store additional photo information.
+        <br>
+        It's an alternative solution for defining title and description.
+        <br>
+        <b>Tags/keywords</b> are defined in this file.
+        <br>
+        <br>
+        The metadate file has the same name as the image, with the extension '.txt'.
+        <br>
+        File content syntax:
+        <br>
+        <pre><code>
+        title= this is my title
+        description= this is my descritption
+        tags=tag1 tag2 tag3
+        </code></pre>
+        <br><br>
+        
+        <b>- Album covers</b>
+        <br>
+        By default, the first image found in a folder will be used for the album cover image.
+        <br>
+        The cover image can be specified by adding a leading @@@@@ to the filename of the image to be used.
+        <br><br>
+        
+        <br>
+        <b>- IDs</b>
+        <br>
+        Please note that filenames and folder names are used as IDs. So if you rename an image or folder, previous used links to the renamed element will no longer work.
+        <br><br>
+        
+        <br>
+        <b>- Supported image formats</b>
+        <br>
+        JPEG, GIF and PNG.        
+        <br><br>
+        
+        <br>
+        <b>- Custom configuration</b>
+        <br>
+        Custom settings are defined in <b>nano_photos_provider2.cfg</b>
+        
+        </span>
+        <br><br><br>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>section</th>
+                <th>option</th>
+                <th>default value</th>
+                <th>description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>config</b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>fileExtensions</td>
+                <td>"jpg|jpeg|png|gif"</td>
+                <td>Supported file extensions (separtor is |)</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>contentFolder</td>
+                <td>"nano_photos_content"</td>
+                <td>Folder where albums and images are stored</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>sortOrder</td>
+                <td>"asc"</td>
+                <td>Filename sort order (asc or desc)</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>titleDescSeparator</td>
+                <td>"$$"</td>
+                <td>Separator between title and description in the filename or foldername</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>albumCoverDetector</td>
+                <td>"@@@@@"</td>
+                <td>Leading sequence in the filename of the image to be used as an album cover</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>ignoreDetector</td>
+                <td>"_hidden"</td>
+                <td>Ignore photos/albums (folders) containing this sequence in their name</td>
+              </tr>
+              <tr>
+                <td><b>images</b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>maxSize*</td>
+                <td>1900</td>
+                <td>max. width/height of the displayed images</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>jpegQuality*</td>
+                <td>85</td>
+                <td>JPEG quality of the images</td>
+              </tr>
+              <tr>
+                <td><b>thumbnails</b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>jpegQuality*</td>
+                <td>85</td>
+                <td>JPEG quality for the thumbnails</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>blurredImageQuality*</td>
+                <td>3</td>
+                <td>Quality of the blurred images (higher is better but slower)</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>allowedSizeValues</td>
+                <td>""</td>
+                <td>
+                  List of allowed values for thumbnail image sizes (separtor is |)
+                  <br>
+                  Values should be the same as in your nanogallery2 settings.
+                  <br>
+                  Example: allowedSizeValues = "100|150|300|auto"
+                </td>
+              </tr>
+              <tr>
+                <td><b>security</b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>allowOrigins</td>
+                <td>"*"</td>
+                <td>
+                  List of allowed domain (CORS)
+                  <br>
+                  Example: allowOrigins = "http://nanogallery2.nanostudio.org"
+                </td>
+              </tr>
+              <tr>
+                <td><b>memory</b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>unlimited</td>
+                <td>false</td>
+                <td>
+                  Set to true to disable PHP memory management. May be useful for large images.
+                  <br>
+                  Use with caution!
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          *: after changing any of these values, please delete all <b>_thumbnails</b> folders to refresh the cached data.
+        </div>
+        
+        
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+  </div>
+
+
+  <br><br><br>
+  <br><br><br><br><br><br><br><br>
+
+
+
+  <svg class="svg-diag" style="background-color:#fff;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none">
+    <polygon points="100 0 100 10 -50 10" style="fill:#eee;"/>
+  </svg>
+  <div class="jumbotron">
+    <div class="container">
+      <div class="row lead">
+        <h2 class="text-center">Requirements</h2>
+        <br><br><br>
+        <a href="http://nanogallery2.nanostudio.org">nanogallery2</a> >= v1.4
+        <br>
+        Webserver
+        <br>
+        PHP > v5.2 with GD-Library enabled
+        
+        <br><br><br><br><br><br>
+        
+        <h2 class="text-center">Tips and tricks</h2>
+        <br><br><br>
+        
+        <b>- Usage on a LOCAL WEB SERVER</b>
+        <br>
+        Due to browser security features, dataProvider can not point to localhost, 127.0.0.1 or similar.
+        <br>
+        Possible workaround:
+        <ul>
+          <li>configure your server to allow CORS (see https://enable-cors.org/server.html),</li>
+          <li>or install a browser extension to disable CORS checking.</li>
+        </ul>
+        <br><br>
+        
+        <b>- Perfomances</b>
+        <br>
+        Lowres images, thumbnails and blurred images are generated on first request and then cached on disk.
+        <br>
+        On first use, or after adding a large amount of new images, you may encounter delays and timeouts -> reload the page until you don't get any error. Generated data will then be cached, for faster access.
+        <br><br>
+        
+        <br>
+        <b>- SECURITY</b>
+        <br>
+        Generation of thumbnails could be missused to satured the server disk space.
+        <br>
+        It's highly recommanded to limit accepted values for thumbnail sizes in the nano_photos_provider2.cfg configuration file.
+        <br><br>
+        
+        <br>
+        <b>- Limitations</b>
+        <br>
+        The nanogallery2 option <b>locationHash</b> should NOT be enabled if albums have more than 2 levels.
+        
+        
+      
+      </div>
+    </div>
+  </div>
+  <svg class="svg-diag" style="background-color:#eee;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none">
+    <polygon points="100 0 100 10 -50 10" style="fill:#0F1934;"/>
+  </svg>
+  <div class="jumbotron ngy2_bgdark">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-1" ></div>
+        <div class="col-md-10" >
+          <h2>Licensing</h2>
+          <br><br><br><br>
+          <p class="lead">nanoPhotosProvider2 is open source and licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.html/" target="_blank">GPLv3 license</a>. 
+        </div>
+        <div class="col-md-1" ></div>
+      </div>
+    </div>
+  </div>
+  <svg class="svg-diag" style="background-color:#0F1934;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none">
+    <polygon points="100 0 100 10 -50 10" style="fill:#eee;"/>
+  </svg>
+
+  <div class="jumbotron">
+    <div class="container">
+  
+      <div class="row text-center">
+        <div class="col-md-2" ></div>
+        <div class="col-md-8 lead" >
+          <h2><i class="fa fa-ambulance fa-2x" aria-hidden="true"></i> Support</h2>
+          Need help using nanoPhotosProvider2?
+        </div>
+        <div class="col-md-2" ></div>
+      </div>
+      <br><br><br>
+      <div class="row">
+        <div class="col-md-2" ></div>
+        <div class="col-md-8" >
+          <p>
+            Start by reading the <b>documentation</b> <i class="fa fa-smile-o" aria-hidden="true"></i>.
+            <br>
+            Questions, issues and bugs should be reported on <a href="https://github.com/nanostudio-org/nanogallery2/issues" class="lead" target="_blank">Github</a>.
+          </p>
+          </div>
+        <div class="col-md-2" ></div>
+      </div>
+    </div>
+    <br><br><br><br><br><br>
+  </div>
+  
+ 
+
+  
+  
+  
+  
+  
+  <!-- ######################## -->
+  <!-- ##### START FOOTER ##### -->
+  <!-- ######################## -->
+
+  <svg class="svg-diag" style="background-color:#eee;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none">
+    <polygon points="100 0 100 10 -00 10" style="fill:#1d1731;"/>
+  </svg>
+
+  <footer class="footer text-center lead" style="background-color:#1d1731;">
+    <div class="container" style="color:#fff;">
+      <div class="row text-right">
+        <a href="https://github.com/nanostudio-org/nano_photos_provider2/blob/gh-pages/index.html" class="btn btn-default btn-x" target="_blank"><i class="fa fa-github" aria-hidden="true"></i> edit this page in github</a>
+      </div>
+      <div class="row text-center">
+        nanoPhotosProvider2 by <a style="color:#fff;" href="http://brisbois.fr">christophe brisbois</a>
+        - 
+        <a class="typeform-share link" style="color:#fff;" href="https://krisb1.typeform.com/to/AZEb6k" data-mode="1" target="_blank"><b>[contact form]</b></a>
+        <script>(function(){var qs,js,q,s,d=document,gi=d.getElementById,ce=d.createElement,gt=d.getElementsByTagName,id='typef_orm_share',b='https://s3-eu-west-1.amazonaws.com/share.typeform.com/';if(!gi.call(d,id)){js=ce.call(d,'script');js.id=id;js.src=b+'share.js';q=gt.call(d,'script')[0];q.parentNode.insertBefore(js,q)}})()</script>
+      <br><br>
+      </div>
+
+    </div>
+  </footer>
+</body>
+</html>
+
