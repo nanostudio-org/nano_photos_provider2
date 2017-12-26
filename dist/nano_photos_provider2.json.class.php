@@ -339,6 +339,28 @@ class galleryJSON
       return ($b) ? +1 : -1;
     }
 
+    function image_fix_orientation(&$image, &$size, $filename) {
+        $exif = exif_read_data($filename);
+
+        if (!empty($exif['Orientation'])) {
+            switch ($exif['Orientation']) {
+                case 3:
+                    $image = imagerotate($image, 180, 0);
+                    break;
+
+                case 6:
+                    $image = imagerotate($image, -90, 0);
+                    list($size[0],$size[1]) = array($size[1],$size[0]);
+                    break;
+
+                case 8:
+                    $image = imagerotate($image, 90, 0);
+                    list($size[0],$size[1]) = array($size[1],$size[0]);
+                    break;
+            }
+        }
+    }
+
 
     /**
      * RETRIEVE ONE IMAGE'S DISPLAY URL
@@ -386,6 +408,8 @@ class galleryJSON
           return false;
           break;
       }
+
+      $this->image_fix_orientation($orgImage, $size, $baseFolder . $filename);
 
       $width  = $size[0];
       $height = $size[1];
@@ -488,6 +512,9 @@ class galleryJSON
           return '';
           break;
       }
+
+      $this->image_fix_orientation($orgImage, $size, $img);
+
       $width  = $size[0];
       $height = $size[1];
       $thumb = imagecreate(3, 3);
@@ -526,6 +553,7 @@ class galleryJSON
           return '#000000';
           break;
       }
+      $this->image_fix_orientation($orgImage, $size, $img);
       $width  = $size[0];
       $height = $size[1];
       
@@ -591,6 +619,7 @@ class galleryJSON
             break;
         }
       }
+      $this->image_fix_orientation($orgImage, $size, $baseFolder . $imagefilename);
         
       $width  = $size[0];
       $height = $size[1];
