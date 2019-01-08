@@ -42,6 +42,8 @@ class item
     public $t_width     = array();        // thumbnails width
     public $t_height    = array();        // thumbnails height
     public $dc          = '#888';         // image dominant color
+    public $mtime       = '';             // ctime of image or album
+    public $ctime       = '';             // mtime of image or album
     // public $dcGIF       = '#000';   // image dominant color
 
 
@@ -129,8 +131,8 @@ class galleryJSON
       }
 
       // sort data
-      usort($lstAlbums, array('galleryJSON','Compare'));
-      usort($lstImages, array('galleryJSON','Compare'));
+      usort($lstAlbums, array('galleryJSON','CompareAlbum'));
+      usort($lstImages, array('galleryJSON','CompareFile'));
 
       $response = array('nano_status' => 'ok', 'nano_message' => '', 'album_content' => array_merge($lstAlbums, $lstImages));
 
@@ -213,6 +215,13 @@ class galleryJSON
       $this->config['contentFolder']          = $config['config']['contentFolder'];
       $this->config['fileExtensions']         = $config['config']['fileExtensions'];
       $this->config['sortOrder']              = strtoupper($config['config']['sortOrder']);
+      // Check if a different sort order is specified for albums
+      if (array_key_exists('sortOrderAlbum', $config['config'])){
+        $this->config['sortOrderAlbum']         = strtoupper($config['config']['sortOrderAlbum']);
+      }
+      else {
+        $this->config['sortOrderAlbum']         = strtoupper($config['config']['sortOrder']);
+      }
       $this->config['titleDescSeparator']     = $config['config']['titleDescSeparator'];
       $this->config['albumCoverDetector']     = $config['config']['albumCoverDetector'];
       $this->config['ignoreDetector']         = strtoupper($config['config']['ignoreDetector']);
@@ -315,15 +324,77 @@ class galleryJSON
      * @param object $b
      * @return int
      */
-    protected function Compare($a, $b)
+    protected function CompareFile($a, $b)
     {
-      $al = strtolower($a->title);
-      $bl = strtolower($b->title);
+      $order_array = explode("_", $this->config['sortOrder']);
+      if (count($order_array) > 1) {
+        switch ($order_array[1]){
+          case 'CTIME':
+            $al = strtolower($a->ctime);
+            $bl = strtolower($b->ctime);
+            break;
+          case 'MTIME':
+          default:
+            $al = strtolower($a->mtime);
+            $bl = strtolower($b->mtime);
+            break;
+        }
+      }
+      else {
+        $al = strtolower($a->title);
+        $bl = strtolower($b->title);
+      }
       if ($al == $bl) {
           return 0;
       }
       $b = false;
-      switch ($this->config['sortOrder']) {
+      switch ($order_array[0]) {
+        case 'DESC' :
+          if ($al < $bl) {
+            $b = true;
+          }
+          break;
+        case 'ASC':
+        default:
+          if ($al > $bl) {
+            $b = true;
+          }
+          break;
+      }
+      return ($b) ? +1 : -1;
+    }
+
+    /**
+     *
+     * @param object $a
+     * @param object $b
+     * @return int
+     */
+    protected function CompareAlbum($a, $b)
+    {
+      $order_array = explode("_", $this->config['sortOrderAlbum']);
+      if (count($order_array) > 1) {
+        switch ($order_array[1]){
+          case 'CTIME':
+            $al = strtolower($a->ctime);
+            $bl = strtolower($b->ctime);
+            break;
+          case 'MTIME':
+          default:
+            $al = strtolower($a->mtime);
+            $bl = strtolower($b->mtime);
+            break;
+        }
+      }
+      else {
+        $al = strtolower($a->title);
+        $bl = strtolower($b->title);
+      }
+      if ($al == $bl) {
+          return 0;
+      }
+      $b = false;
+      switch ($order_array[0]) {
         case 'DESC' :
           if ($al < $bl) {
             $b = true;
@@ -913,6 +984,8 @@ class galleryJSON
         // $this->currentItem->src             = rawurlencode($this->CustomEncode($this->config['contentFolder'] . $this->album . '/' . $filename));
         $this->currentItem->originalURL     = rawurlencode($this->CustomEncode($this->config['contentFolder'] . $this->album . '/' . $filename));
         $this->currentItem->src             = $this->GetImageDisplayURL($this->data->fullDir, $filename);
+        $this->currentItem->ctime           = filectime($this->data->fullDir . $filename);
+        $this->currentItem->mtime           = filemtime($this->data->fullDir . $filename);
 
         if( $this->currentItem->src == '' ) {
           $this->currentItem->src = $this->currentItem->originalURL;
@@ -937,6 +1010,8 @@ class galleryJSON
         $e = $this->GetMetaData($filename, false);
         $this->currentItem->title           = $e->title;
         $this->currentItem->description     = $e->description;
+        $this->currentItem->ctime           = filectime($this->data->fullDir . $filename);
+        $this->currentItem->mtime           = filemtime($this->data->fullDir . $filename);
 
         $this->currentItem->albumID         = rawurlencode($this->albumID);
         if ($this->albumID == '0' || $this->albumID == '') {
