@@ -688,13 +688,23 @@
                 <td></td>
                 <td>sortOrder</td>
                 <td>"asc"</td>
-                <td>Filename sort order (asc or desc), ctime sort order (asc_ctime, desc_ctime), mtime sort order (asc_mtime, desc_mtime)</td>
+                <td>Filename sort order (asc or desc), ctime sort order (asc_ctime, desc_ctime), mtime sort order (asc_mtime, desc_mtime),
+                  sort using prefix (see sortPrefixSeparator for further details)(asc_prefix, desc_prefix)
+                </td>
               </tr>
               <tr>
                 <td></td>
                 <td>sortOrderAlbum</td>
                 <td>""</td>
                 <td>Album sort order, if not specified will sort using the same order specified in sortOrder</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>sortPrefixSeparator</td>
+                <td>"=="</td>
+                <td>Separator between sort prefix and the title.  Everything before the separator (the "Prefix") and the separator
+                  will be excluded from the title.  The Prefix can be used to sort the albums or files.  Helpful if you want to 
+                  sort by date, but don't want the date to appear in the title such as: 2012-05015==Some Title</td>
               </tr>
               <tr>
                 <td></td>
