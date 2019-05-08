@@ -18,6 +18,9 @@ Main features:
   
   
 <br>
+
+### Limitations
+Only english characters are supported (no `éàęąùâä...`).
   
 ### :copyright: License
 nanoPhotosProvider2 is open source and licensed under GPLv3 license.
