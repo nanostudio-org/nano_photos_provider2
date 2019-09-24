@@ -12,7 +12,7 @@
  *
  *
  * PHP 5.2+
- * @version       1.1.0
+ * @version       1.2.0
  * @author        Christophe BRISBOIS - http://www.brisbois.fr/
  * @Contributor   Ruplahlava - https://github.com/Ruplahlava
  * @Contributor   EelcoA  - https://github.com/EelcoA

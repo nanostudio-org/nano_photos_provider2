@@ -12,13 +12,18 @@
  * -------- ALL OTHER USES REQUIRE THE PURCHASE OF A COMMERCIAL LICENSE.
  *
  * PHP 5.2+
- * @version       1.1.0
+ * @version       1.2.0
  * @author        Christophe BRISBOIS - http://www.brisbois.fr/
  * @copyright     Copyright 2015+
  * @license       GPL v3 and commercial
  * @link          https://github.com/nanostudio-org/nanoPhotosProvider2
  * @Support       https://github.com/nanostudio-org/nanoPhotosProvider2/issues
  *
+ *
+ * Thanks to:
+ * - Kevin Robert Keegan - https://github.com/krkeegan
+ * - Jesper Cockx - https://github.com/jespercockx
+ * - bhartvigsen - https://github.com/bhartvigsen
  */
 
 require './nano_photos_provider2.encoding.php';
@@ -42,10 +47,10 @@ class item
     public $t_width     = array();        // thumbnails width
     public $t_height    = array();        // thumbnails height
     public $dc          = '#888';         // image dominant color
-    public $mtime       = '';             // ctime of image or album
-    public $ctime       = '';             // mtime of image or album
+    public $mtime       = '';             // modified time of image or album
+    public $ctime       = '';             // creation time of image or album
     public $sort        = '';             // a sort string not displayed
-    // public $dcGIF       = '#000';   // image dominant color
+    // public $dcGIF       = '#000';      // image dominant color
 
 
 }
@@ -63,6 +68,7 @@ class galleryJSON
     protected $currentItem;
             
     const CONFIG_FILE    = './nano_photos_provider2.cfg';
+    const APP_VERSION    = '1.2';                                 
 
     public function __construct()
     {
@@ -71,6 +77,7 @@ class galleryJSON
       $this->albumID = '';
       if (isset($_GET['albumID'])) {
         $this->albumID = rawurldecode($_GET['albumID']);
+
       }
       if (!$this->albumID == '0' && $this->albumID != '' && $this->albumID != null) {
         $this->album = '/' . $this->CustomDecode($this->albumID) . '/';
@@ -100,6 +107,65 @@ class galleryJSON
       
       $dh = opendir($this->data->fullDir);
 
+      // check if cached JSON is up to date
+      $JSON_file = $this->data->fullDir . '_thumbnails/cache.json';
+      if (file_exists( $JSON_file )) {
+        $JSON_time = filemtime($JSON_file);
+        
+        // loop to compare files/directories creation time
+        if ($dh != false) {
+        
+          $uptodate = true;
+          while (false !== ($filename = readdir($dh))) {
+            if (is_file($this->data->fullDir . $filename) ) {
+              // it's a file
+              if ($filename != '.' &&
+                      $filename != '..' &&
+                      $filename != '_thumbnails' &&
+                      // preg_match - If the i modifier is set, letters in the pattern match both upper and lower case letters 
+                      preg_match("/\.(" . $this->config['fileExtensions'] . ")*$/i", $filename) &&
+                      strpos($filename, $this->config['ignoreDetector']) == false )
+              {
+                // check creation and modification time
+                if( filemtime( $this->data->fullDir . $filename ) > $JSON_time || filectime( $this->data->fullDir . $filename ) > $JSON_time ) {
+                  $uptodate = false;
+                  break;
+                }
+              }
+            }
+            else {
+              // it's a folder
+              $files = preg_grep('~\.('.$this->config['fileExtensions'].')$~i', scandir($this->data->fullDir . $filename));     // to check if folder contains images
+              if ($filename != '.' &&
+                      $filename != '..' &&
+                      $filename != '_thumbnails' &&
+                      strpos($filename, $this->config['ignoreDetector']) == false && 
+                      !empty($files) )
+              {
+                // check creation and modification time
+                if( filemtime( $this->data->fullDir . $filename ) > $JSON_time || filectime( $this->data->fullDir . $filename ) > $JSON_time ) {
+                  $uptodate = false;
+                  break;
+                }
+                // $lstAlbums[] = $this->PrepareData($filename, 'ALBUM');
+              }
+            }
+          }
+          
+          if( $uptodate == true ) {
+            // JSON cached file is uptodate -> use it
+            $objData = file_get_contents($JSON_file);
+            $response = unserialize($objData);           
+            if( !empty($response) ){
+              closedir($dh);
+              $this->SendData($response);
+              exit ;
+            }
+          }
+
+          rewinddir( $dh );          
+        }
+      }                                           
       // loop the folder to retrieve images and albums
       if ($dh != false) {
         while (false !== ($filename = readdir($dh))) {
@@ -117,7 +183,7 @@ class galleryJSON
           else {
             // it's a folder
             //$files = glob($this->data->fullDir . $filename."/*.{".str_replace("|",",",$this->config['fileExtensions'])."}", GLOB_BRACE);    // to check if folder contains images - warning - glob is not supported by all platforms
-            $files = preg_grep('~\.('.$this->config['fileExtensions'].')$~', scandir($this->data->fullDir . $filename));     // to check if folder contains images
+            $files = preg_grep('~\.('.$this->config['fileExtensions'].')$~i', scandir($this->data->fullDir . $filename));     // to check if folder contains images
             if ($filename != '.' &&
                     $filename != '..' &&
                     $filename != '_thumbnails' &&
@@ -130,14 +196,30 @@ class galleryJSON
         }
         closedir($dh);
       }
+			else {
+				// album not found
+				$response = array( 'nano_status' => 'error', 'nano_message' => 'album not found: ' . rawurlencode($this->data->fullDir) );
+				$this->SendData($response);
+				exit;
+			}
 
       // sort data
-      usort($lstAlbums, array('galleryJSON','CompareAlbum'));
-      usort($lstImages, array('galleryJSON','CompareFile'));
+      // usort($lstAlbums, array('galleryJSON', 'Compare'));
+      // usort($lstImages, array('galleryJSON', 'Compare'));
+      usort($lstAlbums, array('galleryJSON', 'CompareAlbum'));
+      usort($lstImages, array('galleryJSON', 'CompareFile'));
 
       $response = array('nano_status' => 'ok', 'nano_message' => '', 'album_content' => array_merge($lstAlbums, $lstImages));
 
       $this->SendData($response);
+       // cache JSON to disk
+      if (!file_exists( $this->data->fullDir . '_thumbnails' )) {
+        mkdir( $this->data->fullDir . '_thumbnails', 0755, true );
+      }
+      $fp = fopen($JSON_file, "w");
+      fwrite($fp, serialize( $response ));
+      fclose($fp);
+                         
     }
     
     /**
@@ -196,6 +278,8 @@ class galleryJSON
       // set the content-type header
       header('Content-Type: application/json; charset=utf-8');
     
+      // add app version
+      $response[nanophotosprovider] = self::APP_VERSION;
       // return the data
       $output = json_encode($response);     // UTF-8 encoding is mandatory
       if (isset($_GET['jsonp'])) {
@@ -218,13 +302,13 @@ class galleryJSON
       $this->config['sortOrder']              = strtoupper($config['config']['sortOrder']);
       // Check if a different sort order is specified for albums
       if (array_key_exists('sortOrderAlbum', $config['config'])){
-        $this->config['sortOrderAlbum']         = strtoupper($config['config']['sortOrderAlbum']);
+        $this->config['sortOrderAlbum']       = strtoupper($config['config']['sortOrderAlbum']);
       }
       else {
-        $this->config['sortOrderAlbum']         = strtoupper($config['config']['sortOrder']);
+        $this->config['sortOrderAlbum']       = strtoupper($config['config']['sortOrder']);
       }
       $this->config['titleDescSeparator']     = $config['config']['titleDescSeparator'];
-      $this->config['sortPrefixSeparator']     = $config['config']['sortPrefixSeparator'];
+      $this->config['sortPrefixSeparator']    = $config['config']['sortPrefixSeparator'];
       $this->config['albumCoverDetector']     = $config['config']['albumCoverDetector'];
       $this->config['ignoreDetector']         = strtoupper($config['config']['ignoreDetector']);
 
@@ -320,12 +404,14 @@ class galleryJSON
       return $image;
     }
 
-    /**
-     * 
+
+
+     /**
+     * FOR FILES
      * @param object $a
      * @param object $b
      * @return int
-     */
+     */      
     protected function CompareFile($a, $b)
     {
       $order_array = explode("_", $this->config['sortOrder']);
@@ -369,9 +455,9 @@ class galleryJSON
       }
       return ($b) ? +1 : -1;
     }
-
+    
     /**
-     *
+     * FOR ALBUMS
      * @param object $a
      * @param object $b
      * @return int
@@ -400,6 +486,7 @@ class galleryJSON
         $al = strtolower($a->title);
         $bl = strtolower($b->title);
       }
+
       if ($al == $bl) {
           return 0;
       }
@@ -420,26 +507,25 @@ class galleryJSON
       return ($b) ? +1 : -1;
     }
 
+    // Fix image orientation
     function image_fix_orientation(&$image, &$size, $filename) {
-        $exif = exif_read_data($filename);
 
-        if (!empty($exif['Orientation'])) {
-            switch ($exif['Orientation']) {
-                case 3:
-                    $image = imagerotate($image, 180, 0);
-                    break;
-
-                case 6:
-                    $image = imagerotate($image, -90, 0);
-                    list($size[0],$size[1]) = array($size[1],$size[0]);
-                    break;
-
-                case 8:
-                    $image = imagerotate($image, 90, 0);
-                    list($size[0],$size[1]) = array($size[1],$size[0]);
-                    break;
-            }
+      $exif = exif_read_data($filename);
+      if ($exif !== false && !empty($exif['Orientation'])) {
+        switch ($exif['Orientation']) {
+          case 3:
+            $image = imagerotate($image, 180, 0);
+            break;
+          case 6:
+            $image = imagerotate($image, -90, 0);
+            list($size[0],$size[1]) = array($size[1],$size[0]);
+            break;
+          case 8:
+            $image = imagerotate($image, 90, 0);
+            list($size[0],$size[1]) = array($size[1],$size[0]);
+            break;
         }
+      }
     }
 
 
@@ -593,9 +679,9 @@ class galleryJSON
           return '';
           break;
       }
-
+      
       $this->image_fix_orientation($orgImage, $size, $img);
-
+      
       $width  = $size[0];
       $height = $size[1];
       $thumb = imagecreate(3, 3);
@@ -700,8 +786,9 @@ class galleryJSON
             break;
         }
       }
+      
       $this->image_fix_orientation($orgImage, $size, $baseFolder . $imagefilename);
-        
+      
       $width  = $size[0];
       $height = $size[1];
 
@@ -881,7 +968,6 @@ class galleryJSON
         }
         $oneItem->description = '';
       }
-
       # Sort Using a Prefix from sortPrefixSeparator if present
       if (strpos($oneItem->title, $this->config['sortPrefixSeparator']) > 0) {
         // split sort from title
@@ -899,8 +985,8 @@ class galleryJSON
       // the title (=filename) is the ID
       $oneItem->ID= $oneItem->title;
         
-      // read meta data from external file (only images)
-      if ($isImage) {
+      // read meta data from external file (images and albums)
+      // if ($isImage) {
         if( file_exists( $this->data->fullDir . '/' . $filename . '.txt' ) ) {
           $myfile = fopen($this->data->fullDir . '/' . $filename . '.txt', "r") or die("Unable to open file!");
           while(!feof($myfile)) {
@@ -917,7 +1003,7 @@ class galleryJSON
           fclose($myfile);
         }
         
-      }
+      //}
       return $oneItem;
     }
 
@@ -1003,6 +1089,7 @@ class galleryJSON
             if ($filename != '.' &&
                     $filename != '..' &&
                     $filename != '_thumbnails' &&
+                    preg_match("/\.(" . $this->config['fileExtensions'] . ")*$/i", $filename) &&
                     strpos($filename, $this->config['ignoreDetector']) == false && 
                     !empty($filename) )
             {
@@ -1032,6 +1119,7 @@ class galleryJSON
         $e = $this->GetMetaData($filename, true);
         $this->currentItem->title           = $e->title;
         $this->currentItem->description     = $e->description;
+        $this->currentItem->tags            = $e->tags;
         $this->currentItem->sort            = $e->sort;
         // $this->currentItem->src             = rawurlencode($this->CustomEncode($this->config['contentFolder'] . $this->album . '/' . $filename));
         $this->currentItem->originalURL     = rawurlencode($this->CustomEncode($this->config['contentFolder'] . $this->album . '/' . $filename));
