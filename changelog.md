@@ -8,6 +8,14 @@ nanoPhotosProvider2 - add-on for nanogallery2
 ChangeLog 
 ------
 
+v1.2.0
+------
+- data caching for better performances
+- albums now support metadata files
+- new sorting possibilities
+- fixed album content counter when using metadata files
+- some minor bug fixes  
+
 v1.1.0
 ------
 - enhanced error management  
