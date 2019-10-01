@@ -6,7 +6,7 @@ Publish your self-hosted photos simply and automatically to nanogallery2.
 Content is provided on demand when browsing albums in the gallery.  
 Main features:
 - generates responsive thumbnails automatically  
-- compatible with all layouts: grid, justified and cascading
+- compatible with all layouts: grid, justified, cascading and mosaic
 - extraction of dominant colors (single color and gradient/blurred image)  
 - supports photo albums  
 - easy to install and maintain - only flat files / no database
