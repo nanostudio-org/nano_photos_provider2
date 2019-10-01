@@ -20,7 +20,8 @@ Main features:
 <br>
 
 ### Limitations
-Only english characters are supported (no `éàęąùâä...`).
+- Only english characters are supported (no `éàęąùâä...`).
+- The nanogallery2 option `locationHash` should **NOT** be enabled if albums have more than 2 levels.  
   
 ### :copyright: License
 nanoPhotosProvider2 is open source and licensed under GPLv3 license.
