@@ -20,7 +20,7 @@ Main features:
 <br>
 
 ### Limitations
-- Only english characters are supported (no `éàęąùâä...`).
+- Only english characters are supported in filenames (no `éàęąùâä...`). Alternatively, you can define metadata files containing special characters.   
 - The nanogallery2 option `locationHash` should **NOT** be enabled if albums have more than 2 levels.  
   
 ### :copyright: License
