@@ -2,25 +2,27 @@
 /**
  * nanoPhotosProvider2 add-on for nanogallery2
  *
- * This is an add-on for nanogallery2 (image gallery - http://nanogallery2.nanostudio.org).
+ * This is an add-on for nanogallery2 (image gallery - https://nanogallery2.nanostudio.org).
  * This PHP application will publish your images and albums from a PHP webserver to nanogallery2.
  * The content is provided on demand, one album at one time.
- * Responsive thumbnails are generated automatically.
+ * Thumbnails and blurred preview images are generated automatically.
  * Dominant colors are extracted as a base64 GIF.
  * 
- * License: For personal, non-profit organizations, or open source projects (without any kind of fee), you may use nanogallery2 for free. 
- * -------- ALL OTHER USES REQUIRE THE PURCHASE OF A COMMERCIAL LICENSE.
+ * License: nanoPhotosProvider2 is open source and licensed under GPLv3 license. 
  *
- * PHP 5.2+
- * @version       1.2.0
+ * PHP 5.3+
+ * @version       1.2.1
  * @author        Christophe BRISBOIS - http://www.brisbois.fr/
  * @copyright     Copyright 2015+
- * @license       GPL v3 and commercial
+ * @license       GPL v3
  * @link          https://github.com/nanostudio-org/nanoPhotosProvider2
  * @Support       https://github.com/nanostudio-org/nanoPhotosProvider2/issues
  *
  *
  * Thanks to:
+ * - Ruplahlava  https://github.com/Ruplahlava
+ * - EelcoA  - https://github.com/EelcoA
+ * - eae710 - https://github.com/eae710
  * - Kevin Robert Keegan - https://github.com/krkeegan
  * - Jesper Cockx - https://github.com/jespercockx
  * - bhartvigsen - https://github.com/bhartvigsen
@@ -40,6 +42,7 @@ class item
     public $src         = '';             // image URL
     public $title       = '';             // item title
     public $description = '';             // item description
+    public $tags        = '';             // item tags
     public $ID          = '';             // item ID
     public $albumID     = '0';            // parent album ID
     public $kind        = '';             // 'album', 'image'
@@ -87,17 +90,63 @@ class galleryJSON
 
       $this->setConfig(self::CONFIG_FILE);
       
+
       // thumbnail responsive sizes
-      $this->tn_size['wxs']   = strtolower($this->CheckThumbnailSize( $_GET['wxs'] ));
-      $this->tn_size['hxs']   = strtolower($this->CheckThumbnailSize( $_GET['hxs'] ));
-      $this->tn_size['wsm']   = strtolower($this->CheckThumbnailSize( $_GET['wsm'] ));
-      $this->tn_size['hsm']   = strtolower($this->CheckThumbnailSize( $_GET['hsm'] ));
-      $this->tn_size['wme']   = strtolower($this->CheckThumbnailSize( $_GET['wme'] ));
-      $this->tn_size['hme']   = strtolower($this->CheckThumbnailSize( $_GET['hme'] ));
-      $this->tn_size['wla']   = strtolower($this->CheckThumbnailSize( $_GET['wla'] ));
-      $this->tn_size['hla']   = strtolower($this->CheckThumbnailSize( $_GET['hla'] ));
-      $this->tn_size['wxl']   = strtolower($this->CheckThumbnailSize( $_GET['wxl'] ));
-      $this->tn_size['hxl']   = strtolower($this->CheckThumbnailSize( $_GET['hxl'] ));
+
+      // default and server side defined sizes
+      // $this->tn_size['wxs'] = $this->config['thumbnails']['width_xs'];
+      // $this->tn_size['hxs']   = $this->config['thumbnails']['height_xs'];
+      // $this->tn_size['wsm'] = $this->config['thumbnails']['width_sm'];
+      // $this->tn_size['hsm']   = $this->config['thumbnails']['height_sm'];
+      // $this->tn_size['wme'] = $this->config['thumbnails']['width_me'];
+      // $this->tn_size['hme']   = $this->config['thumbnails']['height_me'];
+      // $this->tn_size['wla'] = $this->config['thumbnails']['width_la'];
+      // $this->tn_size['hla']   = $this->config['thumbnails']['height_la'];
+      // $this->tn_size['wxl'] = $this->config['thumbnails']['width_xl'];
+      // $this->tn_size['hxl']   = $this->config['thumbnails']['height_xl'];
+
+      // if( $this->config['thumbnails']['serverSizeDefinition'] == false ) {
+        // server side size definition is only used for default values
+        if (array_key_exists('wxs', $_GET)) {
+          $this->tn_size['wxs']   = strtolower($this->CheckThumbnailSize( $_GET['wxs'] ));
+        }
+        if (array_key_exists('hxs', $_GET)) {
+          $this->tn_size['hxs']   = strtolower($this->CheckThumbnailSize( $_GET['hxs'] ));
+        }
+        
+        if (array_key_exists('wsm', $_GET)) {
+          $this->tn_size['wsm']   = strtolower($this->CheckThumbnailSize( $_GET['wsm'] ));
+        }
+        if (array_key_exists('hsm', $_GET)) {
+          $this->tn_size['hsm']   = strtolower($this->CheckThumbnailSize( $_GET['hsm'] ));
+        }
+
+        if (array_key_exists('wme', $_GET)) {
+          $this->tn_size['wme']   = strtolower($this->CheckThumbnailSize( $_GET['wme'] ));
+        }
+        if (array_key_exists('hme', $_GET)) {
+          $this->tn_size['hme']   = strtolower($this->CheckThumbnailSize( $_GET['hme'] ));
+        }
+
+        if (array_key_exists('wla', $_GET)) {
+          $this->tn_size['wla']   = strtolower($this->CheckThumbnailSize( $_GET['wla'] ));
+        }
+        if (array_key_exists('hla', $_GET)) {
+          $this->tn_size['hla']   = strtolower($this->CheckThumbnailSize( $_GET['hla'] ));
+        }
+
+        if (array_key_exists('wxl', $_GET)) {
+          $this->tn_size['wxl']   = strtolower($this->CheckThumbnailSize( $_GET['wxl'] ));
+        }
+        if (array_key_exists('hxl', $_GET)) {
+          $this->tn_size['hxl']   = strtolower($this->CheckThumbnailSize( $_GET['hxl'] ));
+        }
+      // }        
+      
+      
+      
+
+
       
       $this->data           = new galleryData();
       $this->data->fullDir  = ($this->config['contentFolder']) . ($this->album);
@@ -279,7 +328,7 @@ class galleryJSON
       header('Content-Type: application/json; charset=utf-8');
     
       // add app version
-      $response[nanophotosprovider] = self::APP_VERSION;
+      $response['nanophotosprovider'] = self::APP_VERSION;
       // return the data
       $output = json_encode($response);     // UTF-8 encoding is mandatory
       if (isset($_GET['jsonp'])) {
@@ -336,6 +385,24 @@ class galleryJSON
         $this->config['thumbnails']['jpegQuality'] = $tq;
       }
 
+      // if( isset( $config['thumbnails']['serverSizeDefinition'] ) ) {
+        // $this->config['thumbnails']['serverSizeDefinition'] = $config['thumbnails']['serverSizeDefinition'];
+      // }
+      // else {
+        // $this->config['thumbnails']['serverSizeDefinition'] = false;
+      // }
+      // $this->config['thumbnails']['width_xs'] = $config['thumbnails']['width_xs'];
+      // $this->config['thumbnails']['height_xs'] = $config['thumbnails']['height_xs'];
+      // $this->config['thumbnails']['width_sm'] = $config['thumbnails']['width_sm'];
+      // $this->config['thumbnails']['height_sm'] = $config['thumbnails']['height_sm'];
+      // $this->config['thumbnails']['width_me'] = $config['thumbnails']['width_me'];
+      // $this->config['thumbnails']['height_me'] = $config['thumbnails']['height_me'];
+      // $this->config['thumbnails']['width_la'] = $config['thumbnails']['width_la'];
+      // $this->config['thumbnails']['height_la'] = $config['thumbnails']['height_la'];
+      // $this->config['thumbnails']['width_xl'] = $config['thumbnails']['width_xl'];
+      // $this->config['thumbnails']['height_xl'] = $config['thumbnails']['height_xl'];
+      
+      
       $tbq = $config['thumbnails']['blurredImageQuality'];
       $this->config['thumbnails']['blurredImageQuality'] = 3; // default blurred image quality
       if( ctype_digit(strval($tbq)) ){
@@ -793,11 +860,12 @@ class galleryJSON
       $height = $size[1];
 
       $originalAspect = $width / $height;
-      $thumbAspect    = $thumbWidth / $thumbHeight;
+      // $thumbAspect    = $thumbWidth / $thumbHeight;
 
       if ( $thumbWidth != 'auto' && $thumbHeight != 'auto' ) {
         // IMAGE CROP
         // some inspiration found in donkeyGallery (from Gix075) https://github.com/Gix075/donkeyGallery 
+        $thumbAspect    = $thumbWidth / $thumbHeight;
         if ($originalAspect >= $thumbAspect) {
           // If image is wider than thumbnail (in aspect ratio sense)
           $newHeight = $thumbHeight;

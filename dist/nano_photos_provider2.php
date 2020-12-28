@@ -2,33 +2,41 @@
 /**
  * nanoPhotosProvider2 add-on for nanogallery2
  *
- * This is an add-on for nanogallery2 (image gallery - http://nanogallery2.nanostudio.org).
+ * This is an add-on for nanogallery2 (image gallery - https://nanogallery2.nanostudio.org).
  * This PHP application will publish your images and albums from a PHP webserver to nanogallery2.
  * The content is provided on demand, one album at one time.
  * Thumbnails and blurred preview images are generated automatically.
+ * Dominant colors are extracted as a base64 GIF.
  * 
- * License: GPLv3 for personal, non-profit organizations, or open source projects (without any kind of fee), you may use nanogallery2 for free. 
- * -------- ALL OTHER USES REQUIRE THE PURCHASE OF A COMMERCIAL LICENSE.
+ * License: nanoPhotosProvider2 is open source and licensed under GPLv3 license. 
  *
- *
- * PHP 5.2+
- * @version       1.2.0
+ * PHP 5.3+
+ * @version       1.2.1
  * @author        Christophe BRISBOIS - http://www.brisbois.fr/
- * @Contributor   Ruplahlava - https://github.com/Ruplahlava
- * @Contributor   EelcoA  - https://github.com/EelcoA
- * @Contributor   eae710 - https://github.com/eae710
  * @copyright     Copyright 2015+
- * @license       GPL v3 and commercial
+ * @license       GPL v3
  * @link          https://github.com/nanostudio-org/nanoPhotosProvider2
  * @Support       https://github.com/nanostudio-org/nanoPhotosProvider2/issues
  *
+ *
+ * Thanks to:
+ * - Ruplahlava  https://github.com/Ruplahlava
+ * - EelcoA  - https://github.com/EelcoA
+ * - eae710 - https://github.com/eae710
+ * - Kevin Robert Keegan - https://github.com/krkeegan
+ * - Jesper Cockx - https://github.com/jespercockx
+ * - bhartvigsen - https://github.com/bhartvigsen
  */
-require './nano_photos_provider2.json.class.php';
+
+ require './nano_photos_provider2.json.class.php';
 
 // Available values development, production
 // Codeigniter env switch https://github.com/bcit-ci/CodeIgniter/
 
 define('ENVIRONMENT', 'production');
+
+
+
 
 switch (ENVIRONMENT) {
     case 'development':
@@ -37,6 +45,7 @@ switch (ENVIRONMENT) {
         $t = new galleryJSON();
         break;
 
+        
     case 'production':
         ini_set('display_errors', 0);
         
@@ -46,14 +55,14 @@ switch (ENVIRONMENT) {
             error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_USER_NOTICE);
         }
 
-        set_error_handler('myErrorHandler');
+        // set_error_handler('myErrorHandler');
         function myErrorHandler($code, $message, $file, $line) {
-            header("HTTP/1.1 200 OK");      // we catched the error, so we send OK to let nanogallery2 display the error message (and so avoid a browser error)
-            header('Content-Type: application/json; charset=utf-8');
-            $response = array('nano_status' => 'error', 'nano_message' => $message . '<br>  ('.basename($file).'/'.$line.')');
-            $output = json_encode($response);
-            echo $output;
-            exit;
+          header("HTTP/1.1 200 OK");      // we catched the error, so we send OK to let nanogallery2 display the error message (and so avoid a browser error)
+          header('Content-Type: application/json; charset=utf-8');
+          $response = array('nano_status' => 'error', 'nano_message' => $message . '<br>  ('.basename($file).'/'.$line.')');
+          $output = json_encode($response);
+          echo $output;
+          exit;
         }
         
         // called at the end of the script (including abnormal end)

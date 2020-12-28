@@ -4,10 +4,18 @@
   echo 'Current PHP version: ' . phpversion() .'<br>';
 
   if (extension_loaded('gd') && function_exists('gd_info')) {
-      echo 'PHP GD library is installed on your web server';
+      echo 'GD library is enabled on your web server';
   }
   else {
-      echo 'PHP GD library is NOT installed on your web server';
+      echo 'GD library is NOT enabled on your web server';
+  }
+  echo '<br>';
+
+  if (extension_loaded('exif') ) {
+      echo 'EXIF library is enabled on your web server';
+  }
+  else {
+      echo 'EXIF library is NOT enabled on your web server';
   }
   echo '<br>';
     
