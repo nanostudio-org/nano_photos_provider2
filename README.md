@@ -31,3 +31,4 @@ nanoPhotosProvider2 is open source and licensed under GPLv3 license.
 * nanogallery2 >= v1.4 (http://nanogallery2.nanostudio.org)
 * Webserver
 * PHP > v5.3 with GD-Library enabled
+* PHP 8 is not supportted
