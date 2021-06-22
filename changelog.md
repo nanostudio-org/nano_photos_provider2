@@ -8,6 +8,10 @@ nanoPhotosProvider2 - add-on for nanogallery2
 ChangeLog 
 ------
 
+v1.2.2
+------
+- minor bug fixes 
+
 v1.2.1
 ------
 - fixed incompatibility with PHP 8
