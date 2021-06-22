@@ -11,7 +11,7 @@
  * License: nanoPhotosProvider2 is open source and licensed under GPLv3 license. 
  *
  * PHP 5.3+
- * @version       1.2.1
+ * @version       1.2.2
  * @author        Christophe BRISBOIS - http://www.brisbois.fr/
  * @copyright     Copyright 2015+
  * @license       GPL v3

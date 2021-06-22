@@ -11,7 +11,7 @@
  * License: nanoPhotosProvider2 is open source and licensed under GPLv3 license. 
  *
  * PHP 5.3+
- * @version       1.2.1
+ * @version       1.2.2
  * @author        Christophe BRISBOIS - http://www.brisbois.fr/
  * @copyright     Copyright 2015+
  * @license       GPL v3
@@ -1011,31 +1011,35 @@ class galleryJSON
      */
     protected function GetMetaData($filename, $isImage)
     {
-      $f=$filename;
+      $oneItem = new item();
+
+      // the filename is the ID
+      $oneItem->ID = $filename;
+
+      $f = $filename;
   
       if ($isImage) {
+        // remove file extension
         $filename = $this->file_ext_strip($filename);
       }
 
-      $oneItem = new item();
-      if (strpos($filename, $this->config['titleDescSeparator']) > 0) {
+
+      //$oneItem->title = str_replace($this->config['albumCoverDetector'], '', $oneItem->title);   // filter cover detector string
+      $filename2 = str_replace($this->config['albumCoverDetector'], '', $filename);   // filter cover detector string
+
+      
+      if (strpos($filename2, $this->config['titleDescSeparator']) > 0) {
         // title and description
-        $s              = explode($this->config['titleDescSeparator'], $filename);
+        $s              = explode($this->config['titleDescSeparator'], $filename2);
         $oneItem->title = $this->CustomEncode($s[0]);
-        if ($isImage) {
-          $oneItem->description = $this->CustomEncode(preg_replace('/.[^.]*$/', '', $s[1]));
-        } else {
-          $oneItem->description = $this->CustomEncode($s[1]);
-        }
+        $oneItem->description = $this->CustomEncode($s[1]);
       } else {
         // only title
-        if ($isImage) {
-          $oneItem->title = $this->CustomEncode($filename);  //(preg_replace('/.[^.]*$/', '', $filename));
-        } else {
-          $oneItem->title = $this->CustomEncode($filename);
-        }
+        $oneItem->title = $this->CustomEncode($filename2);
         $oneItem->description = '';
       }
+
+
       # Sort Using a Prefix from sortPrefixSeparator if present
       if (strpos($oneItem->title, $this->config['sortPrefixSeparator']) > 0) {
         // split sort from title
@@ -1047,11 +1051,13 @@ class galleryJSON
         # Set sort to title otherwise to allow blended sort prefix and not
         $oneItem->sort  = $oneItem->title;
       }
+      
+      
 
-      $oneItem->title = str_replace($this->config['albumCoverDetector'], '', $oneItem->title);   // filter cover detector string
+      //$oneItem->title = str_replace($this->config['albumCoverDetector'], '', $oneItem->title);   // filter cover detector string
         
       // the title (=filename) is the ID
-      $oneItem->ID= $oneItem->title;
+      // $oneItem->ID = $oneItem->title;
         
       // read meta data from external file (images and albums)
       // if ($isImage) {
